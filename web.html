@@ -27,6 +27,20 @@
             overflow-x: hidden;
         }
 
+        /* OFFLINE SCREEN (REAL-TIME) */
+        #offline-screen { 
+            display:none; 
+            position:fixed; 
+            inset:0; 
+            background:#05070a; 
+            z-index:10001; 
+            flex-direction:column; 
+            align-items:center; 
+            justify-content:center; 
+            text-align:center; 
+            padding:20px; 
+        }
+
         /* HEADER DENGAN ANIMASI DEV PULSE */
         header { 
             padding: 50px 20px; 
@@ -278,6 +292,12 @@
 </head>
 <body>
 
+<div id="offline-screen">
+    <div style="font-size: 80px; font-weight: 900; color: var(--accent-blue); text-shadow: 0 0 20px var(--accent-glow);">R</div>
+    <h2 style="color:#ff4757; margin-top: 20px; font-weight: 900;">SERVER KATALOG SEDANG TUTUP</h2>
+    <p style="color:#8b949e; margin-top: 10px;">Harap kembali besok pagi pukul 09:00 WIB.</p>
+</div>
+
 <header>RAYY STORE</header>
 
 <div class="container">
@@ -365,11 +385,22 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    
+    const db = getDatabase(initializeApp({ databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" }));
+
+    // SISTEM MATI OTOMATIS REAL-TIME
+    onValue(ref(db, 'server_status'), (snap) => {
+        document.getElementById('offline-screen').style.display = (snap.val() === "OFF") ? "flex" : "none";
+    });
+
+    // SISTEM KERANJANG & LOGIC
     let cart = [];
     let selectedItems = {};
 
-    function toggleMenu(id) {
+    window.toggleMenu = function(id) {
         const el = document.getElementById(id);
         const allMenus = document.querySelectorAll('.product-list');
         allMenus.forEach(m => { 
@@ -380,20 +411,19 @@
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
-    function select(el, name, price) {
+    window.select = function(el, name, price) {
         const parent = el.parentElement;
         parent.querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
         el.classList.add('selected');
         selectedItems[parent.id] = { name, price };
     }
 
-    function addToCart(...ids) {
+    window.addToCart = function(...ids) {
         let added = false;
         ids.forEach(id => {
             if (selectedItems[id]) {
                 cart.push(selectedItems[id]);
                 delete selectedItems[id];
-                // Reset visual selection
                 const container = document.getElementById(id);
                 if(container) {
                     container.querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
@@ -403,7 +433,6 @@
         });
         if(added) { 
             updateUI(); 
-            // Feedback visual sederhana tanpa alert yang mengganggu vibe
             console.log("Item ditambahkan ke keranjang");
         } else { 
             alert("Pilih produk dulu!"); 
@@ -429,36 +458,28 @@
         document.getElementById('totalPrice').innerText = "Rp " + total.toLocaleString();
     }
 
-    function removeItem(idx) { 
+    window.removeItem = function(idx) { 
         cart.splice(idx, 1); 
         updateUI(); 
     }
 
-    function openCart() { 
+    window.openCart = function() { 
         document.getElementById('cartModal').style.display = 'block'; 
     }
 
-    function closeCart() { 
+    window.closeCart = function() { 
         document.getElementById('cartModal').style.display = 'none'; 
     }
 
-    function payQR() {
+    window.payQR = function() {
         const totalVal = cart.reduce((a, b) => a + b.price, 0);
         if(cart.length === 0) return alert("Keranjang kosong!");
         
-        // Link QRIS
-        window.open("https://yaqobtzy-coder.github.io/all-linkgh/index.html?amount=" + totalVal, "_blank");
-        
-        let text = "*KONFIRMASI BAYAR QRIS*\n\n";
-        cart.forEach(item => text += `- ${item.name}\n`);
-        text += `\n*TOTAL: Rp ${totalVal.toLocaleString()}*`;
-        
-        setTimeout(() => { 
-            window.location.href = `https://wa.me/628131172093?text=${encodeURIComponent(text)}`; 
-        }, 2000);
+        // FIX LINK: Mengarah ke index.html di root
+        window.location.href = "index.html?amount=" + totalVal;
     }
 
-    function payWA() {
+    window.payWA = function() {
         const totalVal = cart.reduce((a, b) => a + b.price, 0);
         if(cart.length === 0) return alert("Keranjang kosong!");
         
