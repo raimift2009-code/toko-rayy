@@ -14,6 +14,7 @@
             --text-white: #ffffff;
             --btn-orange: #ff9800;
             --btn-green: #2ecc71;
+            --dev-red: #ff4757;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,47 +28,61 @@
             overflow-x: hidden;
         }
 
-        /* --- CSS BARU: ANIMASI LOADER R SMOOTH --- */
+        /* --- CSS LOADER (FIXED STUCK ISSUE) --- */
         #loader {
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: var(--bg-main);
-            z-index: 99999;
+            z-index: 100000; /* Paling atas di dunia */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.8s ease-out, visibility 0.8s;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
         }
+
         .logo-r-load {
             font-size: 150px;
             font-weight: 900;
             color: var(--accent-blue);
             text-shadow: 0 0 30px var(--accent-blue);
-            animation: rSmoothPulse 1.8s infinite ease-in-out;
-        }
-        .loader-text {
-            margin-top: 10px;
-            letter-spacing: 5px;
-            font-size: 0.8rem;
-            color: var(--accent-blue);
-            opacity: 0.6;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        @keyframes rSmoothPulse {
-            0% { transform: scale(0.85); opacity: 0.2; filter: blur(8px); }
-            50% { transform: scale(1.1); opacity: 1; filter: blur(0px); text-shadow: 0 0 60px var(--accent-blue); }
-            100% { transform: scale(0.85); opacity: 0.2; filter: blur(8px); }
+            animation: rSmoothPulse 1.5s infinite ease-in-out;
+            user-select: none;
         }
 
-        /* OFFLINE SCREEN (REAL-TIME) */
+        .loader-text {
+            margin-top: 15px;
+            letter-spacing: 5px;
+            font-size: 0.9rem;
+            color: var(--accent-blue);
+            opacity: 0.8;
+            font-weight: 700;
+            text-transform: uppercase;
+            animation: textFade 1.5s infinite;
+        }
+
+        @keyframes rSmoothPulse {
+            0%, 100% { transform: scale(0.9); opacity: 0.4; filter: blur(5px); }
+            50% { transform: scale(1.05); opacity: 1; filter: blur(0px); text-shadow: 0 0 50px var(--accent-blue); }
+        }
+
+        @keyframes textFade {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* --- OFFLINE SCREEN --- */
         #offline-screen { 
             display:none; 
             position:fixed; 
             inset:0; 
-            background:#05070a; 
-            z-index:10001; 
+            background:var(--bg-main); 
+            z-index:99999; 
             flex-direction:column; 
             align-items:center; 
             justify-content:center; 
@@ -75,7 +90,7 @@
             padding:20px; 
         }
 
-        /* HEADER DENGAN ANIMASI DEV PULSE */
+        /* --- HEADER --- */
         header { 
             padding: 50px 20px; 
             text-align: center; 
@@ -85,116 +100,117 @@
             text-transform: uppercase; 
             color: var(--accent-blue); 
             text-shadow: 0 0 20px var(--accent-glow); 
-            animation: smoothPulse 2.5s infinite ease-in-out; 
+            animation: headerPulse 3s infinite ease-in-out; 
         }
 
-        @keyframes smoothPulse { 
-            0%, 100% { transform: scale(1); filter: brightness(1); text-shadow: 0 0 15px var(--accent-glow); } 
-            50% { transform: scale(1.05); filter: brightness(1.3); text-shadow: 0 0 35px var(--accent-blue); } 
+        @keyframes headerPulse { 
+            0%, 100% { transform: scale(1); text-shadow: 0 0 15px var(--accent-glow); } 
+            50% { transform: scale(1.02); text-shadow: 0 0 35px var(--accent-blue); } 
         }
 
         .container { 
-            width: 90%; 
+            width: 92%; 
             max-width: 500px; 
             margin: 0 auto; 
         }
         
-        /* CATEGORY BUTTON STYLE (DEV STYLE) */
+        /* --- CATEGORY BUTTONS --- */
         .category-btn { 
             width: 100%; 
             background: var(--bg-card); 
             border: 1px solid #1f2937; 
-            padding: 20px; 
+            padding: 22px; 
             border-radius: 18px; 
             color: var(--text-white); 
             font-weight: 700; 
             text-align: left; 
-            margin-bottom: 12px; 
+            margin-bottom: 15px; 
             cursor: pointer; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            transition: 0.4s; 
-            border-left: 5px solid var(--accent-blue);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            border-left: 6px solid var(--accent-blue);
         }
 
         .category-btn:hover { 
             border-color: var(--accent-blue); 
-            box-shadow: 0 0 15px var(--accent-glow); 
-            transform: translateY(-3px); 
+            box-shadow: 0 0 20px var(--accent-glow); 
+            transform: scale(1.02); 
         }
 
         .category-btn span.icon { 
             color: var(--accent-blue); 
-            font-size: 1.2em; 
+            font-size: 1.3em; 
             transition: 0.3s;
         }
         
-        /* PRODUCT LIST AREA */
+        /* --- PRODUCT LIST --- */
         .product-list { 
             display: none; 
             background: #090e16; 
-            border-radius: 18px; 
-            padding: 20px; 
-            margin-top: -5px; 
-            margin-bottom: 25px; 
+            border-radius: 20px; 
+            padding: 25px; 
+            margin-top: -10px; 
+            margin-bottom: 30px; 
             border: 1px solid #1f2937; 
-            animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            animation: slideDown 0.4s ease-out; 
         }
 
         @keyframes slideDown { 
-            from { opacity: 0; transform: translateY(-15px); } 
+            from { opacity: 0; transform: translateY(-20px); } 
             to { opacity: 1; transform: translateY(0); } 
         }
         
         .product-title { 
-            font-size: 0.85rem; 
+            font-size: 0.8rem; 
             color: var(--accent-blue); 
-            margin: 15px 0 10px 0; 
+            margin: 20px 0 10px 0; 
             font-weight: 900; 
             text-transform: uppercase; 
-            letter-spacing: 2px;
-            border-bottom: 1px solid #1f2937;
-            padding-bottom: 5px;
+            letter-spacing: 3px;
+            border-bottom: 2px solid #1f2937;
+            padding-bottom: 8px;
         }
 
         .option-list { 
             display: flex; 
             flex-direction: column; 
-            gap: 10px; 
+            gap: 12px; 
         }
 
-        /* OPTION ITEM (WHITE STYLE) */
+        /* --- OPTION ITEMS (STYLE PREMIUM) --- */
         .option-item { 
             background: #ffffff; 
             color: #000000; 
-            padding: 15px; 
-            border-radius: 12px; 
+            padding: 16px; 
+            border-radius: 14px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             cursor: pointer; 
-            font-weight: 700; 
-            font-size: 0.9em; 
+            font-weight: 800; 
+            font-size: 0.95em; 
             border: 3px solid transparent; 
-            transition: 0.3s;
+            transition: 0.2s;
         }
 
         .circle { 
-            width: 22px; 
-            height: 22px; 
+            width: 24px; 
+            height: 24px; 
             border: 2px solid #ccc; 
             border-radius: 50%; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            transition: 0.3s;
         }
 
         .selected { 
             border-color: var(--accent-blue); 
             background: #e0f7ff; 
-            box-shadow: 0 0 15px var(--accent-glow); 
+            box-shadow: 0 0 15px var(--accent-glow);
+            transform: scale(1.02);
         }
 
         .selected .circle { 
@@ -204,111 +220,112 @@
 
         .selected .circle::after { 
             content: ""; 
-            width: 8px; 
-            height: 8px; 
+            width: 10px; 
+            height: 10px; 
             background: white; 
             border-radius: 50%; 
         }
         
         .btn-add { 
             width: 100%; 
-            padding: 15px; 
+            padding: 18px; 
             background: var(--btn-orange); 
             color: white; 
             border: none; 
-            border-radius: 12px; 
+            border-radius: 15px; 
             font-weight: 900; 
             cursor: pointer; 
-            margin-top: 20px; 
-            font-size: 1em; 
+            margin-top: 25px; 
+            font-size: 1.1em; 
             text-transform: uppercase;
-            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
             transition: 0.3s;
         }
 
-        .btn-add:hover { transform: scale(1.02); filter: brightness(1.1); }
+        .btn-add:active { transform: scale(0.95); }
         
-        /* FLOATING CART (DEV NEON BLUE) */
+        /* --- FLOATING CART --- */
         .cart-float { 
             position: fixed; 
-            bottom: 30px; 
+            bottom: 35px; 
             right: 30px; 
             background: var(--accent-blue); 
-            width: 70px; 
-            height: 70px; 
+            width: 75px; 
+            height: 75px; 
             border-radius: 50%; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            font-size: 2em; 
+            font-size: 2.2em; 
             cursor: pointer; 
             color: black; 
             z-index: 1000; 
-            box-shadow: 0 10px 30px var(--accent-glow); 
+            box-shadow: 0 10px 40px var(--accent-glow); 
             transition: 0.3s; 
         }
 
-        .cart-float:hover { transform: scale(1.1) rotate(-10deg); }
+        .cart-float:hover { transform: scale(1.15) rotate(-15deg); }
 
         .badge { 
             position: absolute; 
             top: -5px; 
             right: -5px; 
-            background: #ff4757; 
+            background: var(--dev-red); 
             color: white; 
-            font-size: 14px; 
-            padding: 5px 10px; 
-            border-radius: 50%; 
+            font-size: 15px; 
+            padding: 6px 12px; 
+            border-radius: 50px; 
             font-weight: 900; 
-            box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+            border: 2px solid var(--bg-main);
         }
 
-        /* MODAL STYLING (DEV STYLE) */
+        /* --- MODAL --- */
         .modal { 
             display: none; 
             position: fixed; 
-            z-index: 9999; 
-            left: 0; 
-            top: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.9); 
-            backdrop-filter: blur(8px);
+            z-index: 10000; 
+            inset: 0;
+            background: rgba(0,0,0,0.95); 
+            backdrop-filter: blur(10px);
         }
 
         .modal-content { 
             background: var(--bg-card); 
-            margin: 10% auto; 
+            margin: 15% auto; 
             padding: 30px; 
-            width: 85%; 
-            max-width: 400px; 
-            border-radius: 30px; 
+            width: 90%; 
+            max-width: 420px; 
+            border-radius: 25px; 
             border: 2px solid var(--accent-blue); 
-            box-shadow: 0 0 40px var(--accent-glow);
+            box-shadow: 0 0 50px var(--accent-glow);
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         .btn-pay { 
             width: 100%; 
-            padding: 18px; 
+            padding: 20px; 
             background: var(--accent-blue); 
             color: #000; 
             border: none; 
-            border-radius: 15px; 
+            border-radius: 16px; 
             font-weight: 900; 
             margin-top: 20px; 
             cursor: pointer; 
             text-transform: uppercase;
+            font-size: 1rem;
         }
 
         .btn-wa { 
             width: 100%; 
-            padding: 15px; 
+            padding: 16px; 
             background: var(--btn-green); 
             color: #000; 
             border: none; 
-            border-radius: 15px; 
+            border-radius: 16px; 
             font-weight: 900; 
-            margin-top: 10px; 
+            margin-top: 12px; 
             cursor: pointer; 
             text-transform: uppercase;
         }
@@ -317,8 +334,8 @@
             display: block; 
             text-align: center; 
             color: #f1c40f; 
-            font-size: 0.75em; 
-            margin-top: 15px; 
+            font-size: 0.8em; 
+            margin-top: 20px; 
             font-weight: 600; 
             font-style: italic;
         }
@@ -333,7 +350,7 @@
 
 <div id="offline-screen">
     <div style="font-size: 80px; font-weight: 900; color: var(--accent-blue); text-shadow: 0 0 20px var(--accent-glow);">R</div>
-    <h2 style="color:#ff4757; margin-top: 20px; font-weight: 900;">SERVER KATALOG SEDANG TUTUP</h2>
+    <h2 style="color:var(--dev-red); margin-top: 20px; font-weight: 900;">SERVER KATALOG SEDANG TUTUP</h2>
     <p style="color:#8b949e; margin-top: 10px;">Harap kembali besok pagi pukul 09:00 WIB.</p>
 </div>
 
@@ -430,24 +447,29 @@
     
     const db = getDatabase(initializeApp({ databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" }));
 
-    // --- SCRIPT BARU: FUNGSI LOADER ---
+    // --- LOADER LOGIC ---
     window.initLoader = function() {
-        // Tahan animasi selama 2.5 detik biar mantap
+        const loader = document.getElementById('loader');
         setTimeout(() => {
-            const loader = document.getElementById('loader');
             loader.style.opacity = '0';
             setTimeout(() => {
                 loader.style.visibility = 'hidden';
-            }, 800);
-        }, 2500);
+                loader.style.display = 'none'; // Benar-benar hapus dari layar
+            }, 600);
+        }, 2500); // 2.5 Detik biar mantap
     }
 
     // SISTEM MATI OTOMATIS REAL-TIME
     onValue(ref(db, 'server_status'), (snap) => {
-        document.getElementById('offline-screen').style.display = (snap.val() === "OFF") ? "flex" : "none";
+        const offlineScreen = document.getElementById('offline-screen');
+        if (snap.val() === "OFF") {
+            offlineScreen.style.display = "flex";
+        } else {
+            offlineScreen.style.display = "none";
+        }
     });
 
-    // SISTEM KERANJANG & LOGIC
+    // SISTEM KERANJANG
     let cart = [];
     let selectedItems = {};
 
@@ -455,9 +477,7 @@
         const el = document.getElementById(id);
         const allMenus = document.querySelectorAll('.product-list');
         allMenus.forEach(m => { 
-            if(m.id !== id) {
-                m.style.display = 'none'; 
-            }
+            if(m.id !== id) m.style.display = 'none'; 
         });
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
@@ -482,12 +502,7 @@
                 added = true;
             }
         });
-        if(added) { 
-            updateUI(); 
-            console.log("Item ditambahkan ke keranjang");
-        } else { 
-            alert("Pilih produk dulu!"); 
-        }
+        if(added) updateUI(); else alert("Pilih produk dulu!");
     }
 
     function updateUI() {
@@ -497,11 +512,11 @@
         cart.forEach((item, idx) => {
             total += item.price;
             html += `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:0.9em; background:#161d29; padding:10px; border-radius:10px; border-left: 3px solid var(--accent-blue);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:0.9em; background:#161d29; padding:12px; border-radius:12px; border-left: 4px solid var(--accent-blue);">
                     <span style="font-weight:600;">${item.name}</span>
                     <span style="font-weight:900; color:var(--accent-blue);">
                         Rp ${item.price.toLocaleString()} 
-                        <span onclick="removeItem(${idx})" style="color:#ff4757; cursor:pointer; margin-left:10px; font-size:1.2em">×</span>
+                        <span onclick="removeItem(${idx})" style="color:#ff4757; cursor:pointer; margin-left:10px; font-size:1.3em">×</span>
                     </span>
                 </div>`;
         });
@@ -510,20 +525,4 @@
     }
 
     window.removeItem = function(idx) { 
-        cart.splice(idx, 1); 
-        updateUI(); 
-    }
-
-    window.openCart = function() { 
-        document.getElementById('cartModal').style.display = 'block'; 
-    }
-
-    window.closeCart = function() { 
-        document.getElementById('cartModal').style.display = 'none'; 
-    }
-
-    window.payQR = function() {
-        const totalVal = cart.reduce((a, b) => a + b.price, 0);
-        if(cart.length === 0) return alert("Keranjang kosong!");
-        
-        // REDIRECT
+        cart.s
