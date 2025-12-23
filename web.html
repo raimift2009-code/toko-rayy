@@ -27,6 +27,40 @@
             overflow-x: hidden;
         }
 
+        /* --- CSS BARU: ANIMASI LOADER R SMOOTH --- */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-main);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+        .logo-r-load {
+            font-size: 150px;
+            font-weight: 900;
+            color: var(--accent-blue);
+            text-shadow: 0 0 30px var(--accent-blue);
+            animation: rSmoothPulse 1.8s infinite ease-in-out;
+        }
+        .loader-text {
+            margin-top: 10px;
+            letter-spacing: 5px;
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            opacity: 0.6;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        @keyframes rSmoothPulse {
+            0% { transform: scale(0.85); opacity: 0.2; filter: blur(8px); }
+            50% { transform: scale(1.1); opacity: 1; filter: blur(0px); text-shadow: 0 0 60px var(--accent-blue); }
+            100% { transform: scale(0.85); opacity: 0.2; filter: blur(8px); }
+        }
+
         /* OFFLINE SCREEN (REAL-TIME) */
         #offline-screen { 
             display:none; 
@@ -290,7 +324,12 @@
         }
     </style>
 </head>
-<body>
+<body onload="initLoader()">
+
+<div id="loader">
+    <div class="logo-r-load">R</div>
+    <div class="loader-text">Rayy Store Official</div>
+</div>
 
 <div id="offline-screen">
     <div style="font-size: 80px; font-weight: 900; color: var(--accent-blue); text-shadow: 0 0 20px var(--accent-glow);">R</div>
@@ -391,6 +430,18 @@
     
     const db = getDatabase(initializeApp({ databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" }));
 
+    // --- SCRIPT BARU: FUNGSI LOADER ---
+    window.initLoader = function() {
+        // Tahan animasi selama 2.5 detik biar mantap
+        setTimeout(() => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.visibility = 'hidden';
+            }, 800);
+        }, 2500);
+    }
+
     // SISTEM MATI OTOMATIS REAL-TIME
     onValue(ref(db, 'server_status'), (snap) => {
         document.getElementById('offline-screen').style.display = (snap.val() === "OFF") ? "flex" : "none";
@@ -475,20 +526,4 @@
         const totalVal = cart.reduce((a, b) => a + b.price, 0);
         if(cart.length === 0) return alert("Keranjang kosong!");
         
-        // FIX LINK: Mengarah ke index.html di root
-        window.location.href = "index.html?amount=" + totalVal;
-    }
-
-    window.payWA = function() {
-        const totalVal = cart.reduce((a, b) => a + b.price, 0);
-        if(cart.length === 0) return alert("Keranjang kosong!");
-        
-        let text = "*ORDER MANUAL (WHATSAPP)*\n\n";
-        cart.forEach(item => text += `- ${item.name}\n`);
-        text += `\n*TOTAL: Rp ${totalVal.toLocaleString()}*`;
-        
-        window.open(`https://wa.me/628131172093?text=${encodeURIComponent(text)}`);
-    }
-</script>
-</body>
-</html>
+        // REDIRECT
