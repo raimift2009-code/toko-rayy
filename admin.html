@@ -8,30 +8,30 @@
         :root { --accent: #00d2ff; --bg: #05070a; --card: #0d121b; --green: #2ecc71; }
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--bg); color: #fff; padding: 20px; }
-
-        /* LOADER LOGO R */
         #loader { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; transition: 1s; }
         .logo-r { font-size: 80px; font-weight: 900; color: var(--accent); text-shadow: 0 0 30px var(--accent); animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } }
-
-        /* LOGIN SCREEN STYLE */
         #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .login-card { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid #1f2937; width: 100%; max-width: 350px; text-align: center; }
         .login-card input { width: 100%; padding: 12px; margin: 10px 0; background: #161d29; border: 1px solid #1f2937; color: #fff; border-radius: 10px; outline: none; }
         .btn-login { width: 100%; padding: 12px; background: var(--accent); color: #000; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-        /* NOTIF SLIDE */
-        .notif { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--accent); padding: 15px 30px; border-radius: 15px; z-index: 10000; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,210,255,0.4); text-align: center; min-width: 280px; font-weight: bold; }
+        .notif { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--accent); padding: 15px 30px; border-radius: 15px; z-index: 10000; transition: 0.6s; box-shadow: 0 10px 30px rgba(0,210,255,0.4); text-align: center; min-width: 280px; font-weight: bold; }
         .notif.show { top: 30px; }
-
         .trx-card { background: var(--card); border-radius: 18px; padding: 20px; margin-bottom: 15px; border-left: 6px solid var(--accent); position: relative; }
         .trx-card.success { border-left-color: var(--green); }
         .trx-val { font-size: 1.2rem; font-weight: 800; margin-bottom: 5px; }
         .status-badge { position: absolute; top: 20px; right: 20px; font-size: 0.8rem; font-weight: bold; }
         .btn-acc { width: 100%; padding: 12px; background: var(--green); border: none; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        /* STYLE OFFLINE */
+        #offline-screen { display:none; position:fixed; inset:0; background:#000; z-index:11000; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
     </style>
 </head>
 <body>
+
+<div id="offline-screen">
+    <h1 style="color:red; font-size: 40px;">SERVER OFF</h1>
+    <p>Admin Panel tidak dapat diakses selama toko tutup.</p>
+</div>
 
 <div id="loader"><div class="logo-r">R</div></div>
 <div id="notif-box" class="notif">Pesan</div>
@@ -59,13 +59,15 @@
     import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
     const db = getDatabase(initializeApp({ databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" }));
 
-    // Login Logic
+    // CEK STATUS SERVER
+    onValue(ref(db, 'server_status'), (snap) => {
+        document.getElementById('offline-screen').style.display = snap.val() === "OFF" ? "flex" : "none";
+    });
+
     window.handleLogin = () => {
         const user = document.getElementById('admin-user').value;
         const pass = document.getElementById('admin-pass').value;
-
-        // Lu bisa ganti username & password di sini Ngab
-        if (user === "admin_rayy" && pass === "rayy123") {
+        if (user === "admin_rayy" && pass === "085794") {
             showNotif("✅ Login Berhasil!");
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'block';
@@ -101,7 +103,7 @@
                     <div class="trx-val">${data.amount}</div>
                     <div style="font-size:0.7rem; color:#8b949e;">${data.time}</div>
                     <div class="status-badge" style="color:${isDone ? '#2ecc71' : '#f1c40f'}">${isDone ? '✓ Sukses' : '⏳ Pending'}</div>
-                    ${!isDone ? `<button class="btn-acc" onclick="accTrx('${data.orderId}')">KONFIRMASI PEMBAYARAN</button>` : ''}
+                    ${!isDone ? `<button class="btn-acc" onclick="accTrx('${data.orderId}')">KONFIRMASI</button>` : ''}
                 </div>
             ` + container.innerHTML;
         });
