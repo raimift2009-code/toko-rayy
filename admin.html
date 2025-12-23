@@ -3,125 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN PANEL | RAYYSTORE</title>
+    <title>ADMIN | RIWAYAT TRANSAKSI</title>
     <style>
-        :root { --accent: #00d2ff; --bg: #05070a; --card: #0d121b; --green: #2ecc71; --yellow: #f1c40f; }
+        :root { --accent: #00d2ff; --bg: #05070a; --card: #0d121b; --green: #2ecc71; }
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: #fff; padding: 20px; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; padding: 20px; }
 
-        /* LOADER */
-        #loader { position:fixed; inset:0; background:var(--bg); z-index:10000; display:flex; align-items:center; justify-content:center; transition: 0.8s; }
+        /* LOADER LOGO R */
+        #loader { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; transition: 1s; }
         .logo-r { font-size: 80px; font-weight: 900; color: var(--accent); text-shadow: 0 0 30px var(--accent); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(0.9); opacity: 0.6; } 50% { transform: scale(1.1); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } }
 
-        /* NOTIF */
-        #notif { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #000; padding: 15px 30px; border-radius: 15px; font-weight: bold; z-index: 10001; transition: 0.5s; box-shadow: 0 10px 30px rgba(0,210,255,0.4); }
-        #notif.show { top: 20px; }
+        /* LOGIN SCREEN STYLE */
+        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid #1f2937; width: 100%; max-width: 350px; text-align: center; }
+        .login-card input { width: 100%; padding: 12px; margin: 10px 0; background: #161d29; border: 1px solid #1f2937; color: #fff; border-radius: 10px; outline: none; }
+        .btn-login { width: 100%; padding: 12px; background: var(--accent); color: #000; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        /* LOGIN */
-        #login-admin { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: var(--card); padding: 40px; border-radius: 25px; border: 1px solid #1f2937; width: 90%; max-width: 380px; text-align: center; border-top: 5px solid var(--accent); }
-        input { width: 100%; padding: 14px; margin: 10px 0; background: #161d29; border: 1px solid #1f2937; color: #fff; border-radius: 12px; outline: none; }
-        .btn-login { width: 100%; padding: 14px; background: var(--accent); color: #000; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        /* NOTIF SLIDE */
+        .notif { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--accent); padding: 15px 30px; border-radius: 15px; z-index: 10000; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,210,255,0.4); text-align: center; min-width: 280px; font-weight: bold; color: var(--accent); }
+        .notif.show { top: 30px; }
 
-        /* OFFLINE LOCK */
-        #offline-screen { display:none; position:fixed; inset:0; background:#000; z-index:11000; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
-
-        /* CONTENT */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #1f2937; padding-bottom: 15px; }
-        .trx-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border-left: 6px solid var(--accent); position: relative; transition: 0.3s; }
+        .trx-card { background: var(--card); border-radius: 18px; padding: 20px; margin-bottom: 15px; border-left: 6px solid var(--accent); position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .trx-card.success { border-left-color: var(--green); }
-        .trx-id { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 5px; }
-        .trx-amt { font-size: 1.4rem; font-weight: 800; margin: 5px 0; }
-        .trx-user { font-size: 0.9rem; color: #8b949e; }
-        .status-badge { position: absolute; top: 20px; right: 20px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; }
-        .btn-acc { width: 100%; padding: 12px; background: var(--green); border: none; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; color: #000; }
+        .trx-val { font-size: 1.2rem; font-weight: 800; margin-bottom: 5px; color: #fff; }
+        .status-badge { position: absolute; top: 20px; right: 20px; font-size: 0.8rem; font-weight: bold; }
+        .btn-acc { width: 100%; padding: 12px; background: var(--green); border: none; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; transition: 0.3s; }
+        .btn-acc:hover { filter: brightness(1.2); transform: scale(1.02); }
+
+        .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #1f2937; }
     </style>
 </head>
 <body>
 
 <div id="loader"><div class="logo-r">R</div></div>
-<div id="notif">Pesan</div>
+<div id="notif-box" class="notif">Pesan</div>
 
-<div id="offline-screen">
-    <h1 style="color:red; font-size: 3em;">LOCKED</h1>
-    <p>Server sedang OFFLINE. Aktifkan di Dev Panel.</p>
-</div>
-
-<div id="login-admin">
+<div id="login-screen">
     <div class="login-card">
-        <h2 style="margin-bottom:20px; color: var(--accent);">ADMIN LOGIN</h2>
-        <input type="text" id="adm-user" placeholder="Username Admin">
-        <input type="password" id="adm-pass" placeholder="Password (085794)">
+        <div class="logo-r" style="font-size: 40px; margin-bottom: 20px;">R</div>
+        <h3 style="margin-bottom: 20px; color: var(--accent);">ADMIN LOGIN</h3>
+        <input type="text" id="admin-user" placeholder="Username (admin_rayy)">
+        <input type="password" id="admin-pass" placeholder="Access Key">
         <button class="btn-login" onclick="handleLogin()">MASUK KE PANEL</button>
     </div>
 </div>
 
-<div id="main-content" style="display:none;">
-    <div class="header">
+<div id="admin-panel" style="display: none;">
+    <div class="header-panel">
         <div>
-            <h2 style="letter-spacing: 2px;">RIWAYAT <span style="color:var(--accent)">TRANSAKSI</span></h2>
-            <p id="total-count" style="font-size: 0.8rem; color: #8b949e;">Total: 0 Pesanan</p>
+            <h2 style="color: var(--accent);">Riwayat Transaksi</h2>
+            <p id="total-text" style="color: #8b949e;">Total: 0</p>
         </div>
-        <button onclick="location.reload()" style="background:#161d29; color:#fff; border:1px solid #333; padding:10px 15px; border-radius:10px; cursor:pointer;">Refresh</button>
+        <button onclick="location.reload()" style="background:none; border: 1px solid #333; color: #8b949e; padding: 8px 15px; border-radius: 8px; cursor: pointer;">Refresh</button>
     </div>
-
-    <div id="trx-list">Memuat data transaksi...</div>
+    <div id="trx-list"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
     
-    const db = getDatabase(initializeApp({ databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" }));
+    const firebaseConfig = { databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    window.addEventListener('load', () => { setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 1000); });
-
-    function showNotif(t) {
-        const n = document.getElementById('notif'); n.innerText = t; n.classList.add('show');
-        setTimeout(() => n.classList.remove('show'), 3000);
-    }
-
-    // SERVER LOCK
-    onValue(ref(db, 'server_status'), s => {
-        document.getElementById('offline-screen').style.display = s.val() === "OFF" ? "flex" : "none";
-    });
-
+    // Login Logic pake Data Saved lu
     window.handleLogin = () => {
-        const u = document.getElementById('adm-user').value;
-        const p = document.getElementById('adm-pass').value;
-        if(u === "admin_rayy" && p === "085794") {
-            document.getElementById('login-admin').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-            showNotif("✅ Login Admin Berhasil!");
-        } else { showNotif("❌ Akses Ditolak!"); }
+        const user = document.getElementById('admin-user').value;
+        const pass = document.getElementById('admin-pass').value;
+
+        // Username: admin_rayy, Password: Key Akses Lu (085794)
+        if (user === "admin_rayy" && pass === "085794") {
+            showNotif("✅ Login Berhasil!");
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+        } else {
+            showNotif("❌ User atau Key Salah!");
+        }
     };
 
+    window.addEventListener('load', () => {
+        setTimeout(() => { 
+            document.getElementById('loader').style.opacity = '0'; 
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
+        }, 1500);
+    });
+
+    window.showNotif = (txt) => {
+        const n = document.getElementById('notif-box');
+        n.innerText = txt; n.classList.add('show');
+        setTimeout(() => n.classList.remove('show'), 3000);
+    };
+
+    // Load Data Real-time
     onValue(ref(db, 'transactions'), (snap) => {
         const container = document.getElementById('trx-list');
         container.innerHTML = "";
         let count = 0;
-        if(!snap.exists()) { container.innerHTML = "Belum ada transaksi."; return; }
         
-        snap.forEach(child => {
+        if (!snap.exists()) {
+            container.innerHTML = "<center style='color:#333; margin-top:50px;'>Belum ada transaksi.</center>";
+            return;
+        }
+
+        snap.forEach((child) => {
             count++;
-            const d = child.val();
-            const isDone = d.status === "Sukses";
-            container.innerHTML = `
-                <div class="trx-card ${isDone ? 'success' : ''}">
-                    <div class="trx-id">${d.orderId}</div>
-                    <div class="trx-amt">${d.amount}</div>
-                    <div class="trx-user">Buyer: ${d.buyer} | ${d.time}</div>
-                    <div class="status-badge" style="color:${isDone ? 'var(--green)' : 'var(--yellow)'}">${isDone ? '✓ SUKSES' : '⏳ PENDING'}</div>
-                    ${!isDone ? `<button class="btn-acc" onclick="acc('${d.orderId}')">KONFIRMASI PEMBAYARAN</button>` : ''}
-                </div>
-            ` + container.innerHTML;
+            const data = child.val();
+            const isDone = data.status === "Sukses";
+            
+            // Layout Kartu Transaksi
+            const card = document.createElement('div');
+            card.className = `trx-card ${isDone ? 'success' : ''}`;
+            card.innerHTML = `
+                <div style="color:var(--accent); font-size:0.75rem; font-weight:bold; margin-bottom:5px;">ID: ${data.orderId}</div>
+                <div style="font-size:0.9rem; font-weight:bold; color:#fff; margin-bottom:2px;">Pembeli: ${data.buyer || 'Unknown'}</div>
+                <div class="trx-val">${data.amount}</div>
+                <div style="font-size:0.7rem; color:#8b949e;">${data.time}</div>
+                <div class="status-badge" style="color:${isDone ? '#2ecc71' : '#f1c40f'}">${isDone ? '✓ SUKSES' : '⏳ PENDING'}</div>
+                ${!isDone ? `<button class="btn-acc" onclick="accTrx('${data.orderId}')">KONFIRMASI PEMBAYARAN</button>` : ''}
+            `;
+            
+            // Masukkan yang terbaru di atas
+            container.insertBefore(card, container.firstChild);
         });
-        document.getElementById('total-count').innerText = "Total: " + count + " Pesanan";
+        document.getElementById('total-text').innerText = "Total: " + count;
     });
 
-    window.acc = (id) => {
-        update(ref(db, 'transactions/' + id), { status: "Sukses" }).then(() => showNotif("✅ Transaksi Berhasil Dikonfirmasi!"));
+    // Fungsi Konfirmasi
+    window.accTrx = (id) => {
+        if(confirm("Konfirmasi pembayaran untuk ID: " + id + "?")) {
+            update(ref(db, `transactions/${id}`), { status: "Sukses" }).then(() => {
+                showNotif("✅ Transaksi Berhasil Di-ACC!");
+            }).catch(() => {
+                showNotif("❌ Gagal update data.");
+            });
+        }
     };
 </script>
 </body>
