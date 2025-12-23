@@ -3,370 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAYY STORE - OFFICIAL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <title>RAYY STORE - OFFICIAL PREMIUM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --bg-main: #05070a; 
-            --bg-card: #0d121b; 
-            --accent-blue: #00d2ff; 
-            --accent-glow: rgba(0, 210, 255, 0.4); 
+        :root {
+            --bg-main: #020408;
+            --bg-card: #0a0f18;
+            --bg-hover: #121a29;
+            --accent-blue: #00d2ff;
+            --accent-glow: rgba(0, 210, 255, 0.5);
             --text-white: #ffffff;
+            --text-dim: #8b949e;
             --btn-orange: #ff9800;
             --btn-green: #2ecc71;
             --dev-red: #ff4757;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: var(--bg-main); 
-            color: var(--text-white); 
-            margin: 0; 
-            padding-bottom: 120px; 
-            overflow-x: hidden;
+            --neon-border: #1f2937;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 100px;
+        }
+
+        /* --- ADVANCED LOADER STYLE --- */
         #loader {
             position: fixed;
-            inset: 0;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-main);
-            z-index: 100000;
+            z-index: 1000000;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.8s ease-out, visibility 0.8s;
+            transition: all 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
         }
 
         .logo-r-load {
-            font-size: 150px;
+            font-size: 180px;
             font-weight: 900;
             color: var(--accent-blue);
-            text-shadow: 0 0 30px var(--accent-blue);
-            animation: rSmoothPulse 1.8s infinite ease-in-out;
+            text-shadow: 0 0 40px var(--accent-glow);
+            animation: rCyberPulse 2s infinite ease-in-out;
+            user-select: none;
         }
 
-        .loader-text {
-            margin-top: 10px;
-            letter-spacing: 5px;
-            font-size: 0.8rem;
+        .loader-bar {
+            width: 200px;
+            height: 4px;
+            background: #111;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loader-progress {
+            position: absolute;
+            width: 0%;
+            height: 100%;
+            background: var(--accent-blue);
+            box-shadow: 0 0 15px var(--accent-blue);
+            animation: loadProgress 2.5s forwards ease-in-out;
+        }
+
+        @keyframes rCyberPulse {
+            0% { transform: scale(0.8) rotate(-5deg); opacity: 0.3; filter: blur(10px); }
+            50% { transform: scale(1.1) rotate(0deg); opacity: 1; filter: blur(0px); text-shadow: 0 0 70px var(--accent-blue); }
+            100% { transform: scale(0.8) rotate(5deg); opacity: 0.3; filter: blur(10px); }
+        }
+
+        @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
+
+        /* --- HEADER & HERO --- */
+        header {
+            padding: 60px 20px 40px;
+            text-align: center;
+            background: radial-gradient(circle at center, #0d121b 0%, transparent 70%);
+        }
+
+        .shop-name {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: 10px;
             color: var(--accent-blue);
-            opacity: 0.6;
-            font-weight: 600;
             text-transform: uppercase;
+            text-shadow: 0 0 25px var(--accent-glow);
+            animation: titleGlow 3s infinite alternate;
         }
 
-        @keyframes rSmoothPulse {
-            0% { transform: scale(0.85); opacity: 0.2; filter: blur(8px); }
-            50% { transform: scale(1.1); opacity: 1; filter: blur(0px); text-shadow: 0 0 60px var(--accent-blue); }
-            100% { transform: scale(0.85); opacity: 0.2; filter: blur(8px); }
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px var(--accent-glow); }
+            to { text-shadow: 0 0 45px var(--accent-blue); transform: translateY(-2px); }
         }
 
-        #offline-screen { 
-            display:none; 
-            position:fixed; 
-            inset:0; 
-            background:#05070a; 
-            z-index:10001; 
-            flex-direction:column; 
-            align-items:center; 
-            justify-content:center; 
-            text-align:center; 
-            padding:20px; 
+        .container { width: 94%; max-width: 600px; margin: 0 auto; }
+
+        /* --- CATEGORY CARDS --- */
+        .category-wrapper { margin-bottom: 20px; }
+
+        .category-btn {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--neon-border);
+            padding: 25px;
+            border-radius: 20px;
+            color: var(--text-white);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 8px solid var(--accent-blue);
+            position: relative;
+            overflow: hidden;
         }
 
-        header { 
-            padding: 50px 20px; 
-            text-align: center; 
-            font-weight: 900; 
-            font-size: 2.5em; 
-            letter-spacing: 6px; 
-            text-transform: uppercase; 
-            color: var(--accent-blue); 
-            text-shadow: 0 0 20px var(--accent-glow); 
-            animation: smoothPulse 2.5s infinite ease-in-out; 
+        .category-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-blue);
+            box-shadow: 0 10px 30px rgba(0, 210, 255, 0.2);
+            transform: translateY(-5px);
         }
 
-        @keyframes smoothPulse { 
-            0%, 100% { transform: scale(1); filter: brightness(1); text-shadow: 0 0 15px var(--accent-glow); } 
-            50% { transform: scale(1.05); filter: brightness(1.3); text-shadow: 0 0 35px var(--accent-blue); } 
+        .category-info h3 { font-size: 1.1rem; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .category-info p { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+
+        /* --- PRODUCT LIST EXPAND --- */
+        .product-list {
+            display: none;
+            background: #05090f;
+            border-radius: 0 0 20px 20px;
+            padding: 25px;
+            margin-top: -10px;
+            margin-bottom: 25px;
+            border: 1px solid var(--neon-border);
+            border-top: none;
+            animation: slideIn 0.5s forwards;
         }
 
-        .container { width: 90%; max-width: 500px; margin: 0 auto; }
-        
-        .category-btn { 
-            width: 100%; 
-            background: var(--bg-card); 
-            border: 1px solid #1f2937; 
-            padding: 20px; 
-            border-radius: 18px; 
-            color: var(--text-white); 
-            font-weight: 700; 
-            text-align: left; 
-            margin-bottom: 12px; 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            transition: 0.4s; 
-            border-left: 5px solid var(--accent-blue);
-        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
 
-        .category-btn:hover { 
-            border-color: var(--accent-blue); 
-            box-shadow: 0 0 15px var(--accent-glow); 
-            transform: translateY(-3px); 
+        .section-title {
+            font-size: 0.75rem;
+            color: var(--accent-blue);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin: 25px 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
+        .section-title::after { content: ""; flex: 1; height: 1px; background: #1f2937; }
 
-        .product-list { 
-            display: none; 
-            background: #090e16; 
-            border-radius: 18px; 
-            padding: 20px; 
-            margin-top: -5px; 
-            margin-bottom: 25px; 
-            border: 1px solid #1f2937; 
-            animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-        }
+        /* --- ITEM SELECTION --- */
+        .items-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
-        @keyframes slideDown { 
-            from { opacity: 0; transform: translateY(-15px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
-        .product-title { 
-            font-size: 0.85rem; 
-            color: var(--accent-blue); 
-            margin: 15px 0 10px 0; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            letter-spacing: 2px;
-            border-bottom: 1px solid #1f2937;
-            padding-bottom: 5px;
-        }
-
-        .option-item { 
-            background: #ffffff; 
-            color: #000000; 
-            padding: 15px; 
-            border-radius: 12px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            cursor: pointer; 
-            font-weight: 700; 
-            font-size: 0.9em; 
-            border: 3px solid transparent; 
+        .option-item {
+            background: #ffffff;
+            color: #000000;
+            padding: 18px 22px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 800;
             transition: 0.3s;
-            margin-bottom: 10px;
+            border: 4px solid transparent;
         }
 
-        .selected { 
-            border-color: var(--accent-blue); 
-            background: #e0f7ff; 
-            box-shadow: 0 0 15px var(--accent-glow); 
+        .option-item:active { transform: scale(0.96); }
+
+        .selected {
+            background: #e0f7ff;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 20px var(--accent-glow);
         }
 
-        .btn-add { 
-            width: 100%; 
-            padding: 15px; 
-            background: var(--btn-orange); 
-            color: white; 
-            border: none; 
-            border-radius: 12px; 
-            font-weight: 900; 
-            cursor: pointer; 
-            margin-top: 20px; 
+        .price-tag { color: var(--accent-blue); font-size: 0.9em; background: rgba(0, 210, 255, 0.1); padding: 4px 10px; border-radius: 8px; }
+
+        .btn-add-cart {
+            width: 100%;
+            padding: 20px;
+            margin-top: 30px;
+            background: linear-gradient(45deg, var(--btn-orange), #ff6b00);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: 900;
             text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(255, 152, 0, 0.3);
         }
 
-        .cart-float { 
-            position: fixed; 
-            bottom: 30px; 
-            right: 30px; 
-            background: var(--accent-blue); 
-            width: 70px; 
-            height: 70px; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 2em; 
-            z-index: 1000; 
-            box-shadow: 0 10px 30px var(--accent-glow); 
+        /* --- FLOATING ELEMENTS --- */
+        .cart-trigger {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 80px;
+            height: 80px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2em;
+            box-shadow: 0 15px 45px var(--accent-glow);
+            z-index: 999;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        .badge { 
-            position: absolute; 
-            top: -5px; 
-            right: -5px; 
-            background: #ff4757; 
-            color: white; 
-            font-size: 14px; 
-            padding: 5px 10px; 
-            border-radius: 50%; 
-            font-weight: 900; 
-        }
-
-        .modal { 
-            display: none; 
-            position: fixed; 
-            z-index: 9999; 
-            inset: 0;
-            background: rgba(0,0,0,0.9); 
-            backdrop-filter: blur(8px);
-        }
-
-        .modal-content { 
-            background: var(--bg-card); 
-            margin: 10% auto; 
-            padding: 30px; 
-            width: 85%; 
-            max-width: 400px; 
-            border-radius: 30px; 
-            border: 2px solid var(--accent-blue); 
-        }
     </style>
 </head>
-<body onload="initLoader()">
+<body onload="startApp()">
 
-<div id="loader">
-    <div class="logo-r-load">R</div>
-    <div class="loader-text">Rayy Store Official</div>
-</div>
-
-<div id="offline-screen">
-    <div style="font-size: 80px; font-weight: 900; color: var(--accent-blue);">R</div>
-    <h2 style="color:#ff4757; margin-top: 20px; font-weight: 900;">SERVER KATALOG TUTUP</h2>
-</div>
-
-<header>RAYY STORE</header>
-
-<div class="container">
-    <button class="category-btn" onclick="toggleMenu('menu_script')">
-        <span>🤖 SCRIPT PREMIUM</span> <span>▼</span>
-    </button>
-    <div id="menu_script" class="product-list">
-        <div class="product-title">VAIREZYNE SERIES</div>
-        <div class="option-item" onclick="select(this, 'VAIREZYNE NO UP', 30000)">NO UP - Rp 30k</div>
-        <div class="option-item" onclick="select(this, 'VAIREZYNE FREE UP', 50000)">FREE UP - Rp 50k</div>
-        <div class="option-item" onclick="select(this, 'VAIREZYNE PARTNER', 95000)">PARTNER - Rp 95k</div>
-        <button class="btn-add" onclick="addToCart('menu_script')">+ Keranjang</button>
+    <div id="loader">
+        <div class="logo-r-load">R</div>
+        <div class="loader-bar"><div class="loader-progress"></div></div>
+        <div style="margin-top:20px; color:var(--accent-blue); font-weight:700; letter-spacing:3px; opacity:0.8">SYSTEM INITIALIZING...</div>
     </div>
 
-    <button class="category-btn" onclick="toggleMenu('menu_apk')">
-        <span>💥 APK BUG EREN</span> <span>▼</span>
-    </button>
-    <div id="menu_apk" class="product-list">
-        <div class="option-item" onclick="select(this, 'APK BUG 1H', 5000)">1 HARI - Rp 5k</div>
-        <div class="option-item" onclick="select(this, 'APK BUG PERM', 60000)">PERMANEN - Rp 60k</div>
-        <button class="btn-add" onclick="addToCart('menu_apk')">+ Keranjang</button>
+    <div id="offline-screen" style="display:none; position:fixed; inset:0; background:var(--bg-main); z-index:1000001; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+        <div class="logo-r-load" style="font-size:100px; color:var(--dev-red); text-shadow: 0 0 20px rgba(255,71,87,0.4)">R</div>
+        <h1 style="color:var(--dev-red); margin-top:30px; font-weight:900; letter-spacing:2px">DATABASE DISCONNECTED</h1>
+        <p style="color:var(--text-dim); margin-top:10px; max-width:300px">Server sedang dalam pemeliharaan rutin. Silakan kembali lagi nanti.</p>
     </div>
-</div>
 
-<div class="cart-float" onclick="openCart()">🛒<div id="cart-count" class="badge">0</div></div>
+    <header>
+        <div class="shop-name">RAYY STORE</div>
+        <p style="color:var(--text-dim); font-size:0.8rem; margin-top:10px; letter-spacing:3px">PREMIUM DIGITAL SOLUTIONS</p>
+    </header>
 
-<div id="cartModal" class="modal">
-    <div class="modal-content">
-        <h3 style="text-align:center; color:var(--accent-blue); font-weight: 900;">LIST ORDER</h3>
-        <div id="cartDisplay" style="max-height: 250px; overflow-y: auto; margin: 20px 0;"></div>
-        <div style="display:flex; justify-content:space-between; font-weight:900;">
-            <span>TOTAL:</span><span id="totalPrice" style="color:var(--accent-blue)">Rp 0</span>
+    <div class="container">
+        <div class="category-wrapper">
+            <div class="category-btn" onclick="openMenu('scripts')">
+                <div class="category-info">
+                    <h3>🤖 SCRIPT EXCLUSIVE</h3>
+                    <p>Vairezyne & Alice Series Version</p>
+                </div>
+                <span id="icon-scripts">▼</span>
+            </div>
+            <div id="scripts" class="product-list">
+                <div class="section-title">VAIREZYNE SERIES</div>
+                <div class="items-grid" id="grid-vairezyne">
+                    <div class="option-item" onclick="selectItem(this, 'VAIREZYNE NO UP', 30000)">
+                        <span>NO UPGRADE</span> <span class="price-tag">Rp 30k</span>
+                    </div>
+                    <div class="option-item" onclick="selectItem(this, 'VAIREZYNE FREE UP', 50000)">
+                        <span>FREE UPGRADE</span> <span class="price-tag">Rp 50k</span>
+                    </div>
+                    <div class="option-item" onclick="selectItem(this, 'VAIREZYNE PARTNER', 95000)">
+                        <span>PARTNER GOLD</span> <span class="price-tag">Rp 95k</span>
+                    </div>
+                </div>
+                <div class="section-title">ALICE SERIES</div>
+                <div class="items-grid" id="grid-alice">
+                    <div class="option-item" onclick="selectItem(this, 'ALICE V16', 80000)">
+                        <span>ALICE V16 FULL</span> <span class="price-tag">Rp 80k</span>
+                    </div>
+                </div>
+                <button class="btn-add-cart" onclick="pushToCart('grid-vairezyne', 'grid-alice')">Konfirmasi & Tambah</button>
+            </div>
         </div>
-        <button onclick="payQR()" style="width:100%; padding:18px; background:var(--accent-blue); color:#000; border:none; border-radius:15px; font-weight:900; margin-top:20px; cursor:pointer;">💳 BAYAR QRIS</button>
-        <button onclick="closeCart()" style="width:100%; background:none; color:#555; border:none; margin-top:15px; cursor:pointer;">TUTUP</button>
+
+        <div class="category-wrapper">
+            <div class="category-btn" onclick="openMenu('apk')">
+                <div class="category-info">
+                    <h3>💥 APK BUG CRASHER</h3>
+                    <p>Eren & Titan Series Multi-platform</p>
+                </div>
+                <span id="icon-apk">▼</span>
+            </div>
+            <div id="apk" class="product-list">
+                <div class="items-grid" id="grid-apk">
+                    <div class="option-item" onclick="selectItem(this, 'APK BUG 1H', 5000)"><span>1 HARI</span> <span class="price-tag">Rp 5k</span></div>
+                    <div class="option-item" onclick="selectItem(this, 'APK BUG 1B', 30000)"><span>1 BULAN</span> <span class="price-tag">30k</span></div>
+                    <div class="option-item" onclick="selectItem(this, 'APK BUG PERM', 60000)"><span>PERMANEN</span> <span class="price-tag">60k</span></div>
+                </div>
+                <button class="btn-add-cart" onclick="pushToCart('grid-apk')">Tambah ke Keranjang</button>
+            </div>
+        </div>
     </div>
-</div>
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    
-    const firebaseConfig = { databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" };
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
 
-    window.initLoader = function() {
-        const loader = document.getElementById('loader');
-        setTimeout(() => {
-            loader.style.opacity = '0';
+    <div class="cart-trigger" onclick="toggleCartModal()">
+        🛒 <div id="cart-badge" style="position:absolute; top:-5px; right:-5px; background:var(--dev-red); color:white; font-size:14px; width:28px; height:28px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-weight:900; border:3px solid var(--bg-main)">0</div>
+    </div>
+    <div id="cartModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.96); z-index:10000; backdrop-filter:blur(15px); padding:40px 20px;">
+        <div style="background:var(--bg-card); max-width:450px; margin:auto; border-radius:30px; border:2px solid var(--accent-blue); padding:30px; position:relative;">
+            <h2 style="text-align:center; color:var(--accent-blue); letter-spacing:4px; font-weight:900; margin-bottom:25px;">CHECKOUT</h2>
+            <div id="cartItemsContainer" style="max-height:300px; overflow-y:auto; margin-bottom:20px;"></div>
+            <div style="border-top:2px dashed #1f2937; padding-top:20px; display:flex; justify-content:space-between; font-weight:900; font-size:1.3rem;">
+                <span>GRAND TOTAL</span> <span id="grandTotal" style="color:var(--accent-blue)">Rp 0</span>
+            </div>
+            <button onclick="checkoutQR()" style="width:100%; padding:20px; background:var(--accent-blue); color:black; border:none; border-radius:15px; font-weight:900; margin-top:30px; cursor:pointer; text-transform:uppercase;">💳 Proses Pembayaran</button>
+            <button onclick="toggleCartModal()" style="width:100%; color:var(--text-dim); background:none; border:none; margin-top:15px; font-weight:600; cursor:pointer;">KEMBALI BELANJA</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // FIREBASE CONFIG
+        const config = { databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+        const app = initializeApp(config);
+        const db = getDatabase(app);
+
+        // APP INITIALIZATION
+        window.startApp = function() {
             setTimeout(() => {
-                loader.style.visibility = 'hidden';
-                loader.style.display = 'none';
-            }, 800);
-        }, 2500);
-    };
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 800);
+            }, 2500);
+        };
 
-    onValue(ref(db, 'server_status'), (snapshot) => {
-        const status = snapshot.val();
-        const offline = document.getElementById('offline-screen');
-        if (status === "OFF") {
-            offline.style.display = "flex";
-        } else {
-            offline.style.display = "none";
-        }
-    });
-
-    let cart = [];
-    let selectedItems = {};
-
-    window.toggleMenu = function(id) {
-        const el = document.getElementById(id);
-        const all = document.querySelectorAll('.product-list');
-        all.forEach(m => { if(m.id !== id) m.style.display = 'none'; });
-        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-    };
-
-    window.select = function(el, name, price) {
-        const parent = el.parentElement;
-        parent.querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedItems[parent.id] = { name, price };
-    };
-
-    window.addToCart = function(id) {
-        if (selectedItems[id]) {
-            cart.push(selectedItems[id]);
-            delete selectedItems[id];
-            const container = document.getElementById(id);
-            container.querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
-            updateUI();
-        } else {
-            alert("Pilih salah satu produk!");
-        }
-    };
-
-    function updateUI() {
-        document.getElementById('cart-count').innerText = cart.length;
-        let total = 0;
-        let html = "";
-        cart.forEach((item, index) => {
-            total += item.price;
-            html += `
-                <div style="display:flex; justify-content:space-between; padding:10px; background:#161d29; border-radius:10px; margin-bottom:10px;">
-                    <span>${item.name}</span>
-                    <span style="color:var(--accent-blue); font-weight:bold;">Rp ${item.price.toLocaleString()} 
-                    <span onclick="removeItem(${index})" style="color:red; margin-left:10px; cursor:pointer;">×</span></span>
-                </div>`;
+        // SERVER STATUS MONITOR
+        onValue(ref(db, 'server_status'), (snap) => {
+            const isOff = snap.val() === "OFF";
+            document.getElementById('offline-screen').style.display = isOff ? "flex" : "none";
         });
-        document.getElementById('cartDisplay').innerHTML = html || "<center>Kosong</center>";
-        document.getElementById('totalPrice').innerText = "Rp " + total.toLocaleString();
-    }
 
-    window.removeItem = function(index) {
-        cart.splice(index, 1);
-        updateUI();
-    };
+        // CORE LOGIC
+        let cartState = [];
+        let selectionCache = {};
 
-    window.openCart = function() { document.getElementById('cartModal').style.display = 'block'; };
-    window.closeCart = function() { document.getElementById('cartModal').style.display = 'none'; };
+        window.openMenu = function(id) {
+            const menu = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            const isVisible = menu.style.display === 'block';
+            
+            // Close others
+            document.querySelectorAll('.product-list').forEach(l => l.style.display = 'none');
+            document.querySelectorAll('[id^="icon-"]').forEach(i => i.innerText = '▼');
 
-    window.payQR = function() {
-        const total = cart.reduce((a, b) => a + b.price, 0);
-        if(total === 0) return alert("Keranjang kosong!");
-        window.location.href = "index.html?amount=" + total;
-    };
-</script>
+            if (!isVisible) {
+                menu.style.display = 'block';
+                icon.innerText = '▲';
+            }
+        };
+
+        window.selectItem = function(element, name, price) {
+            const grid = element.parentElement;
+            grid.querySelectorAll('.option-item').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectionCache[grid.id] = { name, price };
+        };
+
+        window.pushToCart = function(...gridIds) {
+            let found = false;
+            gridIds.forEach(gid => {
+                if (selectionCache[gid]) {
+                    cartState.push(selectionCache[gid]);
+                    delete selectionCache[gid];
+                    document.getElementById(gid).querySelectorAll('.option-item').forEach(opt => opt.classList.remove('selected'));
+                    found = true;
+                }
+            });
+
+            if (found) {
+                syncUI();
+                alert("Berhasil ditambahkan ke daftar belanja!");
+            } else {
+                alert("Silakan pilih produk terlebih dahulu!");
+            }
+        };
+
+        function syncUI() {
+            const badge = document.getElementById('cart-badge');
+            const container = document.getElementById('cartItemsContainer');
+            const totalDisplay = document.getElementById('grandTotal');
+            
+            badge.innerText = cartState.length;
+            
+            let total = 0;
+            let html = "";
+
+            cartState.forEach((item, index) => {
+                total += item.price;
+                html += `
+                    <div style="background:#161d29; padding:15px; border-radius:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-left:4px solid var(--accent-blue);">
+                        <div>
+                            <div style="font-weight:700; font-size:0.9rem;">${item.name}</div>
+                            <div style="color:var(--accent-blue); font-size:0.8rem;">Rp ${item.price.toLocaleString()}</div>
+                        </div>
+                        <div onclick="dropItem(${index})" style="color:var(--dev-red); font-size:1.5rem; cursor:pointer; font-weight:900;">&times;</div>
+                    </div>`;
+            });
+
+            container.innerHTML = html || "<div style='color:#555; text-align:center; padding:30px;'>Belum ada pesanan</div>";
+            totalDisplay.innerText = "Rp " + total.toLocaleString();
+        }
+
+        window.dropItem = function(idx) {
+            cartState.splice(idx, 1);
+            syncUI();
+        };
+
+        window.toggleCartModal = function() {
+            const modal = document.getElementById('cartModal');
+            modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+        };
+
+        window.checkoutQR = function() {
+            const total = cartState.reduce((sum, item) => sum + item.price, 0);
+            if (total === 0) return alert("Keranjang masih kosong!");
+            
+            // Redirect to index.html with amount param
+            window.location.href = `index.html?amount=${total}`;
+        };
+    </script>
 </body>
 </html>
