@@ -3,78 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIVE STATUS | RAYYSTORE</title>
+    <title>STATUS PEMBAYARAN | RAYY STORE</title>
     <style>
         :root { --accent: #00d2ff; --bg: #05070a; --card: #0d121b; --green: #2ecc71; }
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: #fff; padding: 20px; text-align: center; }
+        body { background: var(--bg); color: #fff; padding: 20px; overflow-x: hidden; }
 
-        .logo-r { font-size: 60px; font-weight: 900; color: var(--accent); text-shadow: 0 0 20px var(--accent); animation: smoothPulse 2s infinite ease-in-out; margin-bottom: 10px; }
-        @keyframes smoothPulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 40px var(--accent); } }
+        /* LOADING LOGO R PULSE */
+        #loader { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; transition: 1s; }
+        .logo-r { font-size: 80px; font-weight: 900; color: var(--accent); text-shadow: 0 0 30px var(--accent); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } }
 
-        .container { max-width: 500px; margin: 0 auto; }
-        .status-header { margin-bottom: 30px; }
-        .status-header h2 { letter-spacing: 3px; font-weight: 900; }
+        /* HEADER STYLE */
+        .header { text-align: center; margin-top: 20px; margin-bottom: 30px; }
+        .logo-main { font-size: 60px; font-weight: 900; color: var(--accent); text-shadow: 0 0 20px var(--accent); animation: pulse 2s infinite ease-in-out; display: inline-block; }
+        .header h2 { font-size: 1.2rem; letter-spacing: 2px; color: #fff; margin-top: 15px; font-weight: 900; text-transform: uppercase; }
 
-        .live-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid #1f2937; text-align: left; position: relative; animation: slideIn 0.5s ease-out; }
-        @keyframes slideIn { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
-
-        .live-id { font-size: 0.75rem; color: var(--accent); font-weight: bold; }
-        .live-amt { font-size: 1.3rem; font-weight: 800; margin: 5px 0; }
-        .live-status { position: absolute; bottom: 20px; right: 20px; font-weight: bold; font-size: 0.85rem; }
+        /* TRX CARD (VIEW ONLY) */
+        .trx-card { background: var(--card); border-radius: 18px; padding: 20px; margin-bottom: 15px; border-left: 6px solid var(--accent); position: relative; animation: slideIn 0.5s ease; border: 1px solid #1f2937; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .trx-card.success { border-left-color: var(--green); }
         
-        .badge-pending { color: #f1c40f; }
-        .badge-success { color: #2ecc71; text-shadow: 0 0 10px rgba(46, 204, 113, 0.4); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        #empty-msg { color: #555; margin-top: 50px; font-style: italic; }
+        .status-badge { position: absolute; top: 20px; right: 20px; font-size: 0.75rem; font-weight: 900; padding: 6px 12px; border-radius: 10px; background: rgba(0,0,0,0.3); text-transform: uppercase; border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* CS BUTTONS */
+        .cs-container { display: flex; gap: 10px; flex-direction: column; margin-top: 40px; max-width: 400px; margin-left: auto; margin-right: auto; }
+        .btn-cs { padding: 16px; border-radius: 15px; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .wa { background: #25d366; }
+        .tele { background: #0088cc; }
+        .btn-back { background: transparent; border: 1px solid #333; color: #8b949e; margin-top: 10px; }
+        .btn-back:hover { border-color: var(--accent); color: var(--accent); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="status-header">
-        <div class="logo-r">R</div>
-        <h2>LIVE <span style="color:var(--accent)">STATUS</span></h2>
-        <p style="color:#8b949e; font-size: 0.8rem;">Update Transaksi Secara Real-time</p>
+    <div id="loader"><div class="logo-r">R</div></div>
+
+    <div class="header">
+        <div class="logo-main">R</div>
+        <h2>LIVE TRANSACTION STATUS</h2>
+        <p style="color: #8b949e; font-size: 0.8rem; margin-top: 8px; font-weight: 600;">Pantau status pembayaran lu secara Real-Time</p>
     </div>
 
-    <div id="live-list">Memuat data...</div>
-    <div id="empty-msg" style="display:none;">Belum ada transaksi masuk hari ini.</div>
-</div>
+    <div id="status-container" style="max-width: 500px; margin: 0 auto; min-height: 200px;">
+        </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    
-    const db = getDatabase(initializeApp({ databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" }));
+    <div class="cs-container">
+        <p style="text-align:center; font-size:0.8rem; color:#8b949e; margin-bottom:10px; font-weight: bold;">Butuh bantuan atau konfirmasi manual?</p>
+        <a href="https://wa.me/628131172093" class="btn-cs wa">WhatsApp Customer Service</a>
+        <a href="https://t.me/Rayynotjavva" class="btn-cs tele">Telegram Official</a>
+        <a href="index.html" class="btn-cs btn-back">KEMBALI KE BERANDA</a>
+    </div>
 
-    onValue(ref(db, 'transactions'), (snap) => {
-        const container = document.getElementById('live-list');
-        const empty = document.getElementById('empty-msg');
-        container.innerHTML = "";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         
-        if(!snap.exists()) {
-            empty.style.display = "block";
-            container.innerHTML = "";
-            return;
-        }
-        
-        empty.style.display = "none";
-        snap.forEach(child => {
-            const d = child.val();
-            const isDone = d.status === "Sukses";
-            container.innerHTML = `
-                <div class="live-card">
-                    <div class="live-id">${d.orderId}</div>
-                    <div class="live-amt">${d.amount}</div>
-                    <div style="font-size:0.8rem; color:#8b949e;">Pembeli: ${d.buyer.substring(0,3)}***</div>
-                    <div class="live-status ${isDone ? 'badge-success' : 'badge-pending'}">
-                        ${isDone ? '● SELESAI' : '⏳ PROSES'}
-                    </div>
-                </div>
-            ` + container.innerHTML;
+        // Konfigurasi Database
+        const firebaseConfig = { databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Loader Handler
+        window.addEventListener('load', () => {
+            setTimeout(() => { 
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0'; 
+                setTimeout(() => loader.style.display = 'none', 1000);
+            }, 1500);
         });
-    });
-</script>
+
+        // Load & Listen Data Transaksi secara Live
+        onValue(ref(db, 'transactions'), (snap) => {
+            const container = document.getElementById('status-container');
+            container.innerHTML = "";
+            
+            if (!snap.exists()) {
+                container.innerHTML = "<center style='color:#333; margin-top:50px; font-weight:bold;'>BELUM ADA TRANSAKSI TERDETEKSI.</center>";
+                return;
+            }
+
+            // Loop data transaksi
+            snap.forEach((child) => {
+                const data = child.val();
+                const isDone = data.status === "Sukses";
+                
+                // Logika sensor nama (Rayy -> Ra**)
+                let censoredName = "User";
+                if (data.buyer) {
+                    if (data.buyer.length > 2) {
+                        censoredName = data.buyer.substring(0, 2) + "**" + data.buyer.substring(data.buyer.length - 1);
+                    } else {
+                        censoredName = data.buyer + "**";
+                    }
+                }
+
+                // Buat Element Kartu
+                const card = `
+                    <div class="trx-card ${isDone ? 'success' : ''}">
+                        <div style="color:var(--accent); font-size:0.75rem; font-weight:bold; letter-spacing:1px;">ID: ${data.orderId}</div>
+                        <div style="font-size:1.4rem; font-weight:900; margin:8px 0; color:#fff;">${data.amount}</div>
+                        <div style="font-size:0.85rem; color:#8b949e; font-weight:600;">Pembeli: <span style="color:#fff;">${censoredName}</span></div>
+                        <div style="font-size:0.7rem; color:#444; margin-top:5px;">${data.time || ''}</div>
+                        <div class="status-badge" style="color:${isDone ? '#2ecc71' : '#f1c40f'}">
+                            ${isDone ? '✓ TERKONFIRMASI' : '⏳ PENDING'}
+                        </div>
+                    </div>
+                `;
+                
+                // Masukkan data terbaru paling atas
+                container.innerHTML = card + container.innerHTML;
+            });
+        });
+    </script>
 </body>
 </html>
