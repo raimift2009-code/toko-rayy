@@ -68,15 +68,15 @@
         
         <h1 style="margin-bottom:20px; font-size: 1.5rem;">RAYY <span style="color:var(--accent)">STORE</span></h1>
         
-        <input type="text" id="buyer-name" placeholder="Username / ID Game">
-        <input type="number" id="amount" placeholder="Nominal Topup (Rp)">
+        <input type="text" id="buyer-name" placeholder="Username / NAMA LU BEBAS">
+        <input type="number" id="amount" placeholder="Nominal PENGISIAN (SESUAI HARGA BARANG LU)(Rp)">
         
         <button class="btn-pay" onclick="handlePay()">BAYAR SEKARANG</button>
         
         <p class="cs-text">Bantuan & Riwayat</p>
         <div class="cs-container">
-            <a href="https://wa.me/628131172093" class="btn-cs wa">WhatsApp CS</a>
-            <a href="https://t.me/Rayynotjavva" class="btn-cs tele">Telegram CS</a>
+            <a href="https://wa.me/628131172093" class="btn-cs wa">WhatsApp TIM CS</a>
+            <a href="https://t.me/Rayynotjavva" class="btn-cs tele">Telegram TIM CS</a>
             <a href="https://raimift2009-code.github.io/toko-rayy/status.html" class="btn-cs btn-status">🔍 CEK STATUS TRANSAKSI</a>
         </div>
     </div>
@@ -86,8 +86,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
     
-    // Konfigurasi Firebase Anda
+    // --- CONFIG DATA ASLI LU ---
+    const MERCHANT_SLUG = "rayy-store";
+    const API_TOKEN = "ZgjlIcOuqhkp4AJ02XzY9mannYCHZkDy";
     const firebaseConfig = { databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
@@ -104,13 +107,12 @@
         }, 1500);
     });
 
-    // Cek status server ON/OFF
     onValue(ref(db, 'server_status'), (snap) => {
         const status = snap.val();
         document.getElementById('offline-screen').style.display = status === "OFF" ? "flex" : "none";
     });
 
-    // Ambil nominal dari URL jika ada (kiriman dari web.html)
+    // Handle Amount Param
     const urlParams = new URLSearchParams(window.location.search);
     const amountParam = urlParams.get('amount');
     if (amountParam) {
@@ -121,29 +123,35 @@
         const name = document.getElementById('buyer-name').value;
         const amount = document.getElementById('amount').value;
         
-        if(!name || !amount) { 
-            showNotif("⚠️ Isi data dulu bos!"); 
+        if(!name || !amount || amount <= 0) { 
+            showNotif("⚠️ Isi data dengan benar bos!"); 
             return; 
         }
         
-        showNotif("⏳ Mengalihkan ke QRIS...");
-        const orderId = "RAYY" + Date.now();
+        showNotif("⏳ Mengalihkan ke QRIS ...");
         
-        // Simpan data transaksi ke database agar Admin bisa melihat
+        // Generate Unique Order ID
+        const date = new Date();
+        const orderId = "RAYY" + date.getTime();
+        
+        // 1. Simpan Log ke Firebase Admin
         set(ref(db, 'transactions/' + orderId), {
             orderId: orderId,
             buyer: name,
-            amount: "Rp " + parseInt(amount).toLocaleString('id-ID'),
+            amount: parseInt(amount),
             status: "Pending",
+            slug: MERCHANT_SLUG,
             time: new Date().toLocaleString('id-ID')
         }).then(() => {
-            // Redirect ke Link QRIS lu yang baru
+            // 2. Redirect ke Gateway Pakasir Lu
+            // Format: https://app.pakasir.com/pay/[SLUG]/[AMOUNT]?order_id=[ORDERID]&qris_only=1
             setTimeout(() => { 
-                window.location.href = `https://raimift2009-code.github.io/toko-rayy/index.html?amount=${amount}&order_id=${orderId}`; 
-            }, 1500);
-        }).catch((error) => {
-            console.error(error);
-            showNotif("❌ Gagal membuat pesanan.");
+                const targetUrl = `https://app.pakasir.com/pay/${MERCHANT_SLUG}/${amount}?order_id=${orderId}&qris_only=1`;
+                window.location.href = targetUrl; 
+            }, 1200);
+        }).catch((err) => {
+            console.error(err);
+            showNotif("❌ Gagal Terkoneksi Database");
         });
     };
 </script>
